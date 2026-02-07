@@ -13,6 +13,14 @@ export async function GET(
     // ✅ MUST await params in your Next version
     const { id: passportId } = await context.params;
 
+    if (!passportId) {
+      return NextResponse.json(
+        { error: "Invalid passport ID" },
+        { status: 400 },
+      );
+    }
+
+
     console.log("Looking for passport ID:", passportId);
 
     const { searchParams } = new URL(request.url);

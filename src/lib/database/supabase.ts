@@ -12,3 +12,5 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 // Create typed Supabase client - THIS IS THE CRITICAL LINE
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
+export { createClient };
+
