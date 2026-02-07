@@ -60,7 +60,7 @@ export async function POST(req: Request) {
 
   const { data: kpi, error: kpiError } = await supabase
     .from("company_kpis")
-    .insert(kpiRow)
+    .insert([kpiRow] as any)
     .select("*")
     .single();
 
