@@ -5,6 +5,8 @@ import {
   calculateQualityTier,
   calculateRecyclableScore,
 } from "./scoring";
+import { generatePassportQR } from "@/lib/passport/qr-generator";
+// Add this import
 
 type WasteStreamRow = Database["public"]["Tables"]["waste_streams"]["Row"];
 type PassportRow = Database["public"]["Tables"]["material_passports"]["Row"];
@@ -142,6 +144,25 @@ export async function createPassportFromWasteStream(
       `Failed to update waste stream ${wasteStream.id}: ${wasteStreamError.message}`,
     );
   }
+  // Generate QR code (non-blocking)
+  generatePassportQR(passport.id).catch((error) => {
+    console.error("QR generation failed (non-critical):", error);
+  });
 
   return passport;
+}
+
+/**
+ * Generate and store QR code for a passport
+ * Called after passport creation
+ */
+export async function generatePassportQRCode(
+  passportId: string,
+): Promise<string> {
+  const qrDataUrl = await generatePassportQR(passportId);
+
+  // Optional: Store QR code URL in passport metadata
+  // For now, we generate on-demand, but you could cache it
+
+  return qrDataUrl;
 }
