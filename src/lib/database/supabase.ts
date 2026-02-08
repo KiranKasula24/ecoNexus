@@ -10,6 +10,10 @@ if (!supabaseUrl || !supabaseAnonKey) {
   );
 }
 
+console.log("SUPABASE URL:", supabaseUrl);
+console.log("SUPABASE KEY:", supabaseAnonKey);
+
+
 // Create typed Supabase client - THIS IS THE CRITICAL LINE
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
 export { createClient };
