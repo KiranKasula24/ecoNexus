@@ -15,18 +15,19 @@ export async function signUp(
   try {
     console.log("1. Starting signup...");
 
-    // 1. Create auth user
+    // 1️⃣ Try creating auth user
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
     });
 
-    console.log("2. Auth response:", {
-      user: authData.user?.id,
-      error: authError,
-    });
-
+    // If user already exists → recover by signing in
     if (authError) {
+      if (authError.message.includes("User already registered")) {
+        console.warn("User already exists. Attempting recovery via sign in...");
+        return await signIn(email, password);
+      }
+
       console.error("Auth error:", authError);
       throw authError;
     }
@@ -35,16 +36,18 @@ export async function signUp(
       throw new Error("User creation failed - no user returned");
     }
 
-    // 2. Determine locality
+    const userId = authData.user.id;
+
+    // 2️⃣ Determine locality
     const locality = companyData.city.toLowerCase().replace(/\s+/g, "-");
 
-    console.log("3. Creating company for user:", authData.user.id);
+    console.log("2. Creating company for user:", userId);
 
-    // 3. Create company
+    // 3️⃣ Create company
     const { data: company, error: companyError } = await supabase
       .from("companies")
       .insert({
-        user_id: authData.user.id,
+        user_id: userId,
         name: companyData.name,
         industry: companyData.industry,
         entity_type: companyData.entity_type,
@@ -53,17 +56,12 @@ export async function signUp(
           address: companyData.address,
           city: companyData.city,
           country: companyData.country,
-          lat: 48.1351, // Placeholder
+          lat: 48.1351,
           lng: 11.582,
         },
       })
       .select()
       .single();
-
-    console.log("4. Company creation:", {
-      company: company?.id,
-      error: companyError,
-    });
 
     if (companyError) {
       console.error("Company creation error:", companyError);
@@ -74,9 +72,9 @@ export async function signUp(
       throw new Error("Company creation returned no data");
     }
 
-    console.log("5. Creating agent for company:", company.id);
+    console.log("3. Creating agent for company:", company.id);
 
-    // 4. Create agent (moved from trigger to here)
+    // 4️⃣ Create agent
     const agentType =
       companyData.entity_type === "recycler" ? "specialist_recycler" : "local";
 
@@ -92,20 +90,19 @@ export async function signUp(
       .select()
       .single();
 
-    console.log("6. Agent creation:", { agent: agent?.id, error: agentError });
-
     if (agentError) {
-      console.error("Agent creation error:", agentError);
-      // Don't throw - agent can be created later on first login
-      console.warn("Agent creation failed, will retry on first login");
+      console.warn(
+        "Agent creation failed. It will be retried on first login:",
+        agentError,
+      );
     }
 
-    console.log("7. Signup complete!");
+    console.log("Signup complete!");
 
     return {
       user: authData.user,
       company,
-      agent,
+      agent: agent || null,
       session: authData.session,
     };
   } catch (error) {
@@ -123,46 +120,46 @@ export async function signIn(email: string, password: string) {
       password,
     });
 
-    console.log("2. Sign in response:", { user: data.user?.id, error });
-
     if (error) throw error;
     if (!data.user) throw new Error("Login failed");
 
-    console.log("3. Fetching company...");
+    const userId = data.user.id;
 
-    // Fetch company
+    console.log("2. Fetching company...");
+
+    // ✅ Use maybeSingle instead of single
     const { data: company, error: companyError } = await supabase
       .from("companies")
       .select("*")
-      .eq("user_id", data.user.id)
-      .single();
-
-    console.log("4. Company fetch:", {
-      company: company?.id,
-      error: companyError,
-    });
+      .eq("user_id", userId)
+      .maybeSingle();
 
     if (companyError) {
       console.error("Company fetch error:", companyError);
-      throw new Error("Company record not found");
+      throw companyError;
     }
 
-    console.log("5. Checking for agent...");
+    // If company missing → incomplete registration state
+    if (!company) {
+      throw new Error(
+        "Account exists but company setup is incomplete. Please complete registration.",
+      );
+    }
 
-    // Check if agent exists, create if not
+    console.log("3. Checking for agent...");
+
     const { data: existingAgent, error: agentFetchError } = await supabase
       .from("agents")
       .select("id")
       .eq("company_id", company.id)
       .maybeSingle();
 
-    console.log("6. Agent check:", {
-      exists: !!existingAgent,
-      error: agentFetchError,
-    });
+    if (agentFetchError) {
+      console.warn("Agent fetch warning:", agentFetchError);
+    }
 
-    if (!existingAgent && !agentFetchError) {
-      console.log("7. Creating agent on first login...");
+    if (!existingAgent) {
+      console.log("4. Creating agent on first login...");
 
       const agentType =
         company.entity_type === "recycler" ? "specialist_recycler" : "local";
@@ -176,10 +173,7 @@ export async function signIn(email: string, password: string) {
       });
 
       if (agentCreateError) {
-        console.error("Agent creation on login failed:", agentCreateError);
-        // Don't block login for this
-      } else {
-        console.log("8. Agent created successfully on first login");
+        console.warn("Agent creation on login failed:", agentCreateError);
       }
     }
 
@@ -212,9 +206,9 @@ export async function getCurrentUser() {
       .from("companies")
       .select("*")
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
-    if (companyError) return null;
+    if (companyError || !company) return null;
 
     return {
       user,
@@ -225,3 +219,4 @@ export async function getCurrentUser() {
     return null;
   }
 }
+

@@ -1,12 +1,22 @@
-export type AgentType = "local" | "super" | "specialist_recycler";
+export type AgentType =
+  | "local" // Nexa (manufacturers)
+  | "super" // NexaApex (locality coordinators)
+  | "specialist_recycler" // NexaPrime Recycler
+  | "specialist_processor" // NexaPrime Processor
+  | "specialist_logistics" // NexaPrime Logistics
+  | "specialist_energy"; // NexaPrime Energy (future)
+
 export type AgentStatus = "active" | "paused" | "stopped";
+
 export type PostType =
   | "offer"
   | "request"
   | "reply"
   | "announcement"
   | "deal_proposal";
+
 export type Visibility = "local" | "regional" | "public";
+
 export type DealStatus =
   | "negotiating"
   | "pending_seller_approval"
@@ -17,19 +27,9 @@ export type DealStatus =
   | "cancelled"
   | "disputed";
 
-export interface Agent {
-  id: string;
-  company_id: string;
-  name: string;
-  agent_type: AgentType;
-  locality: string;
-  geographic_range_km: number;
-  status: AgentStatus;
-  constraints: AgentConstraints;
-  performance: AgentPerformance;
-  created_at: string;
-  last_active_at: string;
-}
+// ============================================
+// AGENT CONSTRAINTS
+// ============================================
 
 export interface AgentConstraints {
   price_ranges: Record<string, { min: number; max: number }>;
@@ -42,6 +42,39 @@ export interface AgentConstraints {
   material_categories: string[];
 }
 
+export interface SpecialistRecyclerConstraints {
+  accepted_material_categories: string[];
+  min_volume: number;
+  max_volume: number;
+  max_contamination_tolerance: number;
+  geographic_scope: "local" | "regional" | "national";
+  processing_capacity_available: boolean;
+  auto_respond_threshold: number;
+}
+
+export interface SpecialistProcessorConstraints {
+  input_materials: string[];
+  output_materials: string[];
+  min_volume: number;
+  max_volume: number;
+  processing_fee_range: { min: number; max: number };
+  geographic_scope: "local" | "regional";
+  auto_respond_threshold: number;
+}
+
+export interface SpecialistLogisticsConstraints {
+  service_regions: string[];
+  min_load_tons: number;
+  max_distance_km: number;
+  vehicle_types: string[];
+  consolidation_enabled: boolean;
+  auto_respond_threshold: number;
+}
+
+// ============================================
+// CORE INTERFACES
+// ============================================
+
 export interface AgentPerformance {
   opportunities_scanned: number;
   negotiations_started: number;
@@ -49,6 +82,24 @@ export interface AgentPerformance {
   deals_approved: number;
   deals_rejected: number;
   total_value_generated_eur: number;
+}
+
+export interface Agent {
+  id: string;
+  company_id: string | null; // null for NexaApex
+  name: string;
+  agent_type: AgentType;
+  locality: string;
+  geographic_range_km: number;
+  status: AgentStatus;
+  constraints:
+    | AgentConstraints
+    | SpecialistRecyclerConstraints
+    | SpecialistProcessorConstraints
+    | SpecialistLogisticsConstraints;
+  performance: AgentPerformance;
+  created_at: string;
+  last_active_at: string;
 }
 
 export interface FeedPost {
@@ -76,6 +127,10 @@ export interface FeedPost {
   agent?: Agent;
   replies?: FeedPost[];
 }
+
+// ============================================
+// CONTENT SCHEMAS
+// ============================================
 
 export interface OfferContent {
   passport_id: string;
@@ -124,6 +179,10 @@ export interface DealProposalContent {
   deal_id: string;
   summary: string;
 }
+
+// ============================================
+// TRANSACTIONS & SCORING
+// ============================================
 
 export interface Deal {
   id: string;

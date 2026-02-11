@@ -137,12 +137,43 @@ export type Database = {
           },
         ]
       }
+      carbon_factors: {
+        Row: {
+          carbon_kg_per_ton: number
+          id: string
+          material_id: string
+          process_type: string
+          source: string | null
+          valid_from: string
+          valid_until: string | null
+        }
+        Insert: {
+          carbon_kg_per_ton: number
+          id?: string
+          material_id: string
+          process_type: string
+          source?: string | null
+          valid_from: string
+          valid_until?: string | null
+        }
+        Update: {
+          carbon_kg_per_ton?: number
+          id?: string
+          material_id?: string
+          process_type?: string
+          source?: string | null
+          valid_from?: string
+          valid_until?: string | null
+        }
+        Relationships: []
+      }
       companies: {
         Row: {
           created_at: string | null
           entity_type: string | null
           id: string
           industry: string
+          is_setup_complete: boolean | null
           locality: string | null
           location: Json
           name: string
@@ -154,6 +185,7 @@ export type Database = {
           entity_type?: string | null
           id?: string
           industry: string
+          is_setup_complete?: boolean | null
           locality?: string | null
           location: Json
           name: string
@@ -165,6 +197,7 @@ export type Database = {
           entity_type?: string | null
           id?: string
           industry?: string
+          is_setup_complete?: boolean | null
           locality?: string | null
           location?: Json
           name?: string
@@ -438,6 +471,107 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      logistics_profiles: {
+        Row: {
+          accepts_backhaul: boolean | null
+          available_capacity_tons_week: number | null
+          base_rate_per_ton_km: number | null
+          company_id: string
+          consolidation_discount_percentage: number | null
+          created_at: string | null
+          current_routes: Json | null
+          fleet_capacity: Json | null
+          id: string
+          is_setup_complete: boolean | null
+          material_specializations: string[] | null
+          max_distance_km: number | null
+          minimum_load_tons: number | null
+          optimization_priority: string | null
+          service_regions: string[] | null
+          special_requirements: string[] | null
+          updated_at: string | null
+          vehicle_types: string[] | null
+        }
+        Insert: {
+          accepts_backhaul?: boolean | null
+          available_capacity_tons_week?: number | null
+          base_rate_per_ton_km?: number | null
+          company_id: string
+          consolidation_discount_percentage?: number | null
+          created_at?: string | null
+          current_routes?: Json | null
+          fleet_capacity?: Json | null
+          id?: string
+          is_setup_complete?: boolean | null
+          material_specializations?: string[] | null
+          max_distance_km?: number | null
+          minimum_load_tons?: number | null
+          optimization_priority?: string | null
+          service_regions?: string[] | null
+          special_requirements?: string[] | null
+          updated_at?: string | null
+          vehicle_types?: string[] | null
+        }
+        Update: {
+          accepts_backhaul?: boolean | null
+          available_capacity_tons_week?: number | null
+          base_rate_per_ton_km?: number | null
+          company_id?: string
+          consolidation_discount_percentage?: number | null
+          created_at?: string | null
+          current_routes?: Json | null
+          fleet_capacity?: Json | null
+          id?: string
+          is_setup_complete?: boolean | null
+          material_specializations?: string[] | null
+          max_distance_km?: number | null
+          minimum_load_tons?: number | null
+          optimization_priority?: string | null
+          service_regions?: string[] | null
+          special_requirements?: string[] | null
+          updated_at?: string | null
+          vehicle_types?: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "logistics_profiles_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      material_market_prices: {
+        Row: {
+          id: string
+          material_id: string
+          price: number
+          recorded_at: string | null
+          region: string | null
+          source: string | null
+          unit: string | null
+        }
+        Insert: {
+          id?: string
+          material_id: string
+          price: number
+          recorded_at?: string | null
+          region?: string | null
+          source?: string | null
+          unit?: string | null
+        }
+        Update: {
+          id?: string
+          material_id?: string
+          price?: number
+          recorded_at?: string | null
+          region?: string | null
+          source?: string | null
+          unit?: string | null
+        }
+        Relationships: []
       }
       material_passports: {
         Row: {
@@ -745,7 +879,133 @@ export type Database = {
           },
         ]
       }
-      
+      processor_profiles: {
+        Row: {
+          certifications: string[] | null
+          company_id: string
+          created_at: string | null
+          current_utilization_percentage: number | null
+          geographic_service_area: string | null
+          id: string
+          input_materials: string[]
+          input_quality_requirements: Json | null
+          is_setup_complete: boolean | null
+          output_materials: string[]
+          output_quality_guarantee: Json | null
+          processing_capacity_tons_month: number
+          processing_fee_per_ton: Json | null
+          processing_services: string[] | null
+          updated_at: string | null
+          value_share_model: string | null
+        }
+        Insert: {
+          certifications?: string[] | null
+          company_id: string
+          created_at?: string | null
+          current_utilization_percentage?: number | null
+          geographic_service_area?: string | null
+          id?: string
+          input_materials?: string[]
+          input_quality_requirements?: Json | null
+          is_setup_complete?: boolean | null
+          output_materials?: string[]
+          output_quality_guarantee?: Json | null
+          processing_capacity_tons_month?: number
+          processing_fee_per_ton?: Json | null
+          processing_services?: string[] | null
+          updated_at?: string | null
+          value_share_model?: string | null
+        }
+        Update: {
+          certifications?: string[] | null
+          company_id?: string
+          created_at?: string | null
+          current_utilization_percentage?: number | null
+          geographic_service_area?: string | null
+          id?: string
+          input_materials?: string[]
+          input_quality_requirements?: Json | null
+          is_setup_complete?: boolean | null
+          output_materials?: string[]
+          output_quality_guarantee?: Json | null
+          processing_capacity_tons_month?: number
+          processing_fee_per_ton?: Json | null
+          processing_services?: string[] | null
+          updated_at?: string | null
+          value_share_model?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "processor_profiles_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recycler_profiles: {
+        Row: {
+          accepted_material_categories: string[]
+          base_processing_fee_per_ton: Json | null
+          buy_prices_per_ton: Json | null
+          certifications: string[] | null
+          company_id: string
+          created_at: string | null
+          geographic_service_area: string | null
+          id: string
+          is_setup_complete: boolean | null
+          max_contamination_tolerance: number | null
+          min_pickup_volume_tons: number | null
+          output_quality_tiers: number[] | null
+          processing_capacity_tons_month: number
+          processing_methods: string[] | null
+          updated_at: string | null
+        }
+        Insert: {
+          accepted_material_categories?: string[]
+          base_processing_fee_per_ton?: Json | null
+          buy_prices_per_ton?: Json | null
+          certifications?: string[] | null
+          company_id: string
+          created_at?: string | null
+          geographic_service_area?: string | null
+          id?: string
+          is_setup_complete?: boolean | null
+          max_contamination_tolerance?: number | null
+          min_pickup_volume_tons?: number | null
+          output_quality_tiers?: number[] | null
+          processing_capacity_tons_month?: number
+          processing_methods?: string[] | null
+          updated_at?: string | null
+        }
+        Update: {
+          accepted_material_categories?: string[]
+          base_processing_fee_per_ton?: Json | null
+          buy_prices_per_ton?: Json | null
+          certifications?: string[] | null
+          company_id?: string
+          created_at?: string | null
+          geographic_service_area?: string | null
+          id?: string
+          is_setup_complete?: boolean | null
+          max_contamination_tolerance?: number | null
+          min_pickup_volume_tons?: number | null
+          output_quality_tiers?: number[] | null
+          processing_capacity_tons_month?: number
+          processing_methods?: string[] | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recycler_profiles_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       waste_streams: {
         Row: {
           classification: string
@@ -821,6 +1081,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      set_specialist_constraints: {
+        Args: { p_agent_type: string; p_company_id: string }
+        Returns: Json
+      }
       transfer_passport_ownership: {
         Args: { new_owner: string; passport_id: string }
         Returns: undefined

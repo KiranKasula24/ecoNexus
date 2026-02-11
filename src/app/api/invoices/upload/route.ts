@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createServerClient } from "@/lib/database/supabase";
+import { createClient } from "@/lib/database/supabase";
 import type { IdentifiedMaterial, ParsedInvoiceData } from "@/types/material";
 
 type UploadRequest = {
@@ -14,10 +14,18 @@ type UploadRequest = {
 };
 
 export async function POST(req: Request) {
-  const supabase = createServerClient();
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  );
   const body = (await req.json()) as UploadRequest;
 
-  if (!body.company_id || !body.file_url || !body.file_name || !body.file_type) {
+  if (
+    !body.company_id ||
+    !body.file_url ||
+    !body.file_name ||
+    !body.file_type
+  ) {
     return NextResponse.json(
       { error: "company_id, file_url, file_name, and file_type are required." },
       { status: 400 },

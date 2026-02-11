@@ -1,52 +1,49 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
+import ManufacturerDashboard from "@/components/dashboards/ManufacturerDashboard";
+import RecyclerDashboard from "@/components/dashboards/RecyclerDashboard";
+import ProcessorDashboard from "@/components/dashboards/ProcessorDashboard";
+import LogisticsDashboard from "@/components/dashboards/LogisticsDashboard";
 
 export default function DashboardPage() {
-  const { company } = useAuth();
+  const { company, user } = useAuth();
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
 
-  return (
-    <div>
-      <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-      <p className="mt-2 text-gray-600">Welcome to {company?.name}</p>
+  useEffect(() => {
+    if (!company) {
+      router.push("/login");
+      return;
+    }
+    setLoading(false);
+  }, [company, router]);
 
-      <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <svg
-                  className="h-6 w-6 text-gray-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">
-                    Agent Status
-                  </dt>
-                  <dd className="flex items-baseline">
-                    <div className="text-2xl font-semibold text-gray-900">
-                      Active
-                    </div>
-                  </dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Add more stat cards as needed */}
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
-    </div>
-  );
+    );
+  }
+
+  // Route to appropriate dashboard based on entity type
+  const renderDashboard = () => {
+    switch (company?.entity_type) {
+      case "manufacturer":
+        return <ManufacturerDashboard />;
+      case "recycler":
+        return <RecyclerDashboard />;
+      case "energy_recovery":
+        return <ProcessorDashboard />;
+      case "logistics":
+        return <LogisticsDashboard />;
+      default:
+        return <div>Unknown entity type</div>;
+    }
+  };
+
+  return <div>{renderDashboard()}</div>;
 }
