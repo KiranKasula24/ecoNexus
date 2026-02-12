@@ -7,7 +7,6 @@ import { compareToIndustry } from "@/lib/constants/industry-benchmarks";
 
 interface AnalyticsData {
   mci_score: number;
-
   environmental_kpis: {
     total_carbon_emissions: number;
     carbon_per_revenue: number;

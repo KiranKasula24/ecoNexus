@@ -20,7 +20,12 @@ export function DashboardNav() {
         <div className="flex justify-between h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
-              <h1 className="text-xl font-bold text-blue-600">EcoNexus</h1>
+              <Link
+                href="/overview"
+                className="text-xl font-bold text-blue-600 hover:text-blue-700"
+              >
+                EcoNexus
+              </Link>
             </div>
 
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
@@ -91,9 +96,12 @@ export function DashboardNav() {
 
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <span className="text-sm font-medium text-gray-700">
-                {company?.name}
-              </span>
+              <Link
+                href="/kpi_analytics"
+                className="text-sm font-medium text-gray-700 hover:text-gray-900"
+              >
+                {company?.name ?? "Company"}
+              </Link>
             </div>
             <button
               onClick={handleSignOut}

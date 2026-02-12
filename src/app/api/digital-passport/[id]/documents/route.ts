@@ -1,5 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/database/supabase";
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
+
+function createSupabaseServerClient() {
+  const cookieStore = cookies();
+
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        async get(name: string) {
+          return (await cookieStore).get(name)?.value;
+        },
+        set() {},
+        remove() {},
+      },
+    }
+  );
+}
+
 
 export async function POST(
   request: NextRequest,
@@ -11,18 +31,27 @@ export async function POST(
     return NextResponse.json({ error: "Invalid passport ID" }, { status: 400 });
   }
 
-
   try {
+    const supabase = createSupabaseServerClient();
+
+    // 🔐 Get authenticated user
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const formData = await request.formData();
     const file = formData.get("file") as File;
     const documentType = formData.get("document_type") as string;
-    const uploadedBy = formData.get("uploaded_by") as string;
 
     if (!file) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
-    // 1. Verify passport exists
+    // 1️⃣ Verify passport exists
     const { data: passport, error: passportError } = await supabase
       .from("material_passports")
       .select("id")
@@ -36,9 +65,10 @@ export async function POST(
       );
     }
 
-    // 2. Upload file to Supabase Storage
+    // 2️⃣ Upload file to storage
     const fileName = `${passportId}/${Date.now()}-${file.name}`;
-    const { data: uploadData, error: uploadError } = await supabase.storage
+
+    const { error: uploadError } = await supabase.storage
       .from("passport-documents")
       .upload(fileName, file, {
         contentType: file.type,
@@ -49,37 +79,33 @@ export async function POST(
       throw new Error(`File upload failed: ${uploadError.message}`);
     }
 
-    // 3. Get public URL
+    // 3️⃣ Get public URL
     const { data: urlData } = supabase.storage
       .from("passport-documents")
       .getPublicUrl(fileName);
 
     const fileUrl = urlData.publicUrl;
 
-    // 4. Create document record
-    const documentData: any = {
-      passport_id: passportId,
-      document_type: documentType || "certification",
-      file_url: fileUrl,
-      uploaded_by: uploadedBy,
-      verification_status: "pending",
-    };
-
-    const { data: document, error: documentError } = await (
-      supabase.from("passport_documents") as any
-    )
-      .insert(documentData)
+    // 4️⃣ Insert document record
+    const { data: document, error: documentError } = await supabase
+      .from("passport_documents")
+      .insert({
+        passport_id: passportId,
+        document_type: documentType || "certification",
+        file_url: fileUrl,
+        uploaded_by: user.id,
+        verification_status: "pending",
+      })
       .select()
       .single();
 
     if (documentError) {
-      throw new Error(
-        `Document record creation failed: ${documentError.message}`,
-      );
+      console.error("Insert error:", documentError);
+      throw new Error(documentError.message);
     }
 
-    // 5. Create passport event
-    const eventData: any = {
+    // 5️⃣ Create event
+    await supabase.from("passport_events").insert({
       passport_id: passportId,
       event_type: "document_uploaded",
       description: `Document uploaded: ${documentType}`,
@@ -88,19 +114,11 @@ export async function POST(
         document_type: documentType,
         file_name: file.name,
       },
-    };
-
-    await supabase.from("passport_events").insert(eventData);
+    });
 
     return NextResponse.json({
       success: true,
-      document: {
-        id: document.id,
-        passport_id: passportId,
-        document_type: documentType,
-        file_url: fileUrl,
-        verification_status: "pending",
-      },
+      document,
     });
   } catch (error: any) {
     console.error("Document upload error:", error);
@@ -110,14 +128,19 @@ export async function POST(
     );
   }
 }
-
 export async function GET(
   request: NextRequest,
   context: { params: Promise<{ id: string }> },
 ) {
   const { id: passportId } = await context.params;
 
+  if (!passportId || passportId === "undefined") {
+    return NextResponse.json({ error: "Invalid passport ID" }, { status: 400 });
+  }
+
   try {
+    const supabase = createSupabaseServerClient();
+
     const { data: documents, error } = await supabase
       .from("passport_documents")
       .select("*")
@@ -125,7 +148,7 @@ export async function GET(
       .order("created_at", { ascending: false });
 
     if (error) {
-      throw new Error(`Failed to fetch documents: ${error.message}`);
+      throw new Error(error.message);
     }
 
     return NextResponse.json({

@@ -31,7 +31,7 @@ export default function SetupPage() {
       setLoading(false);
 
       if (isComplete) {
-        router.push("/dashboard");
+        router.push("/overview");
       }
     } catch (error) {
       console.error("Setup check error:", error);

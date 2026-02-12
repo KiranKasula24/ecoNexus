@@ -1,56 +1,71 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/database/supabase";
-import type { IdentifiedMaterial, ParsedInvoiceData } from "@/types/material";
-
-type UploadRequest = {
-  company_id: string;
-  file_url: string;
-  file_name: string;
-  file_size: number;
-  file_type: string;
-  extracted_text?: string;
-  parsed_data?: ParsedInvoiceData;
-  materials_identified?: IdentifiedMaterial[];
-};
 
 export async function POST(req: Request) {
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
   );
-  const body = (await req.json()) as UploadRequest;
 
-  if (
-    !body.company_id ||
-    !body.file_url ||
-    !body.file_name ||
-    !body.file_type
-  ) {
+  try {
+    const formData = await req.formData();
+
+    const company_id = formData.get("company_id") as string;
+    const file = formData.get("file") as File;
+
+    if (!company_id || !file) {
+      return NextResponse.json(
+        { error: "company_id and file are required." },
+        { status: 400 },
+      );
+    }
+
+    // 1️⃣ Upload file to Supabase Storage
+    const filePath = `company-${company_id}/${Date.now()}-${file.name}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("invoices")
+      .upload(filePath, file, {
+        contentType: file.type,
+      });
+
+    if (uploadError) {
+      console.error("Storage upload error:", uploadError);
+      return NextResponse.json({ error: uploadError }, { status: 500 });
+    }
+
+    // 2️⃣ Get public URL
+    const { data: publicUrlData } = supabase.storage
+      .from("invoices")
+      .getPublicUrl(filePath);
+
+    const file_url = publicUrlData.publicUrl;
+
+    // 3️⃣ Insert invoice metadata into DB
+    const { data, error } = await supabase
+      .from("invoices")
+      .insert({
+        company_id,
+        file_url,
+        file_name: file.name,
+        file_size: file.size,
+        file_type: file.type,
+        status: "uploaded",
+      })
+      .select("*")
+      .single();
+
+    if (error) {
+      console.error("Database insert error:", error);
+      return NextResponse.json({ error }, { status: 500 });
+    }
+
+    return NextResponse.json({ invoice: data }, { status: 201 });
+  } catch (err) {
+    console.error("Unexpected error:", err);
     return NextResponse.json(
-      { error: "company_id, file_url, file_name, and file_type are required." },
-      { status: 400 },
+      { error: "Something went wrong." },
+      { status: 500 },
     );
   }
-
-  const { data, error } = await supabase
-    .from("invoices")
-    .insert({
-      company_id: body.company_id,
-      file_url: body.file_url,
-      file_name: body.file_name,
-      file_size: body.file_size || 0,
-      file_type: body.file_type,
-      status: "uploaded",
-      extracted_text: body.extracted_text || null,
-      parsed_data: body.parsed_data || null,
-      materials_identified: body.materials_identified || null,
-    })
-    .select("*")
-    .single();
-
-  if (error) {
-    return NextResponse.json({ error }, { status: 500 });
-  }
-
-  return NextResponse.json({ invoice: data }, { status: 201 });
 }

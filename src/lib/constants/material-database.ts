@@ -4,6 +4,7 @@
  */
 
 export interface MaterialProperties {
+  name: string;
   material_id: string;
   category: string;
   subtype: string;
@@ -67,6 +68,7 @@ export const MATERIAL_DATABASE: Record<string, MaterialProperties> = {
   // ============================================
 
   "steel-scrap": {
+    name: "Steel Scrap",
     material_id: "steel-scrap",
     category: "metal",
     subtype: "steel",
@@ -125,6 +127,7 @@ export const MATERIAL_DATABASE: Record<string, MaterialProperties> = {
   },
 
   "aluminum-scrap": {
+    name: "Aluminum Scrap",
     material_id: "aluminum-scrap",
     category: "metal",
     subtype: "aluminum",
@@ -183,6 +186,7 @@ export const MATERIAL_DATABASE: Record<string, MaterialProperties> = {
   },
 
   "copper-scrap": {
+    name: "Copper Scrap",
     material_id: "copper-scrap",
     category: "metal",
     subtype: "copper",
@@ -241,6 +245,7 @@ export const MATERIAL_DATABASE: Record<string, MaterialProperties> = {
   },
 
   "brass-scrap": {
+    name: "Brass Scrap",
     material_id: "brass-scrap",
     category: "metal",
     subtype: "brass",
@@ -299,6 +304,7 @@ export const MATERIAL_DATABASE: Record<string, MaterialProperties> = {
   },
 
   "stainless-steel-scrap": {
+    name: "Stainless Steel Scrap",
     material_id: "stainless-steel-scrap",
     category: "metal",
     subtype: "stainless-steel",
@@ -361,6 +367,7 @@ export const MATERIAL_DATABASE: Record<string, MaterialProperties> = {
   // ============================================
 
   "pet-plastic": {
+    name: "PET Plastic",
     material_id: "pet-plastic",
     category: "plastic",
     subtype: "PET",
@@ -419,6 +426,7 @@ export const MATERIAL_DATABASE: Record<string, MaterialProperties> = {
   },
 
   "hdpe-plastic": {
+    name: "HDPE Plastic",
     material_id: "hdpe-plastic",
     category: "plastic",
     subtype: "HDPE",
@@ -477,6 +485,7 @@ export const MATERIAL_DATABASE: Record<string, MaterialProperties> = {
   },
 
   "pp-plastic": {
+    name: "PP Plastic",
     material_id: "pp-plastic",
     category: "plastic",
     subtype: "PP",
@@ -535,6 +544,7 @@ export const MATERIAL_DATABASE: Record<string, MaterialProperties> = {
   },
 
   "ldpe-plastic": {
+    name: "LDPE Plastic",
     material_id: "ldpe-plastic",
     category: "plastic",
     subtype: "LDPE",
@@ -593,6 +603,7 @@ export const MATERIAL_DATABASE: Record<string, MaterialProperties> = {
   },
 
   "pvc-plastic": {
+    name: "PVC Plastic",
     material_id: "pvc-plastic",
     category: "plastic",
     subtype: "PVC",
@@ -651,6 +662,7 @@ export const MATERIAL_DATABASE: Record<string, MaterialProperties> = {
   },
 
   "mixed-plastic": {
+    name: "Mixed Plastic",
     material_id: "mixed-plastic",
     category: "plastic",
     subtype: "mixed",
@@ -713,6 +725,7 @@ export const MATERIAL_DATABASE: Record<string, MaterialProperties> = {
   // ============================================
 
   cardboard: {
+    name: "Cardboard",
     material_id: "cardboard",
     category: "paper",
     subtype: "cardboard",
@@ -771,6 +784,7 @@ export const MATERIAL_DATABASE: Record<string, MaterialProperties> = {
   },
 
   "office-paper": {
+    name: "Office Paper",
     material_id: "office-paper",
     category: "paper",
     subtype: "office-paper",
@@ -829,6 +843,7 @@ export const MATERIAL_DATABASE: Record<string, MaterialProperties> = {
   },
 
   newspaper: {
+    name: "Newspaper",
     material_id: "newspaper",
     category: "paper",
     subtype: "newspaper",
@@ -891,6 +906,7 @@ export const MATERIAL_DATABASE: Record<string, MaterialProperties> = {
   // ============================================
 
   "glass-mixed": {
+    name: "Glass Mixed",
     material_id: "glass-mixed",
     category: "glass",
     subtype: "mixed",
@@ -949,6 +965,7 @@ export const MATERIAL_DATABASE: Record<string, MaterialProperties> = {
   },
 
   "glass-clear": {
+    name: "Glass Clear",
     material_id: "glass-clear",
     category: "glass",
     subtype: "clear",
@@ -1011,6 +1028,7 @@ export const MATERIAL_DATABASE: Record<string, MaterialProperties> = {
   // ============================================
 
   "organic-food-waste": {
+    name: "Organic Food Waste",
     material_id: "organic-food-waste",
     category: "organic",
     subtype: "food-waste",
@@ -1069,6 +1087,7 @@ export const MATERIAL_DATABASE: Record<string, MaterialProperties> = {
   },
 
   "wood-waste": {
+    name: "Wood Waste",
     material_id: "wood-waste",
     category: "organic",
     subtype: "wood",
@@ -1131,6 +1150,7 @@ export const MATERIAL_DATABASE: Record<string, MaterialProperties> = {
   // ============================================
 
   "textile-cotton": {
+    name: "Textile Cotton",
     material_id: "textile-cotton",
     category: "textile",
     subtype: "cotton",
@@ -1189,6 +1209,7 @@ export const MATERIAL_DATABASE: Record<string, MaterialProperties> = {
   },
 
   "textile-polyester": {
+    name: "Textile Polyester",
     material_id: "textile-polyester",
     category: "textile",
     subtype: "polyester",
@@ -1251,6 +1272,7 @@ export const MATERIAL_DATABASE: Record<string, MaterialProperties> = {
   // ============================================
 
   "rubber-tire": {
+    name: "Rubber Tire",
     material_id: "rubber-tire",
     category: "rubber",
     subtype: "tire",

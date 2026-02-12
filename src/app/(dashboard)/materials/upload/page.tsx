@@ -154,7 +154,7 @@ export default function MaterialUploadPage() {
       {result && (
         <div className="bg-white shadow rounded-lg p-6">
           <h2 className="text-xl font-semibold mb-4">
-            {result.success ? "✅ Upload Successful" : "❌ Upload Failed"}
+            {result.invoice ? "✅ Upload Successful" : "❌ Upload Failed"}
           </h2>
 
           {result.materials_identified &&
@@ -234,12 +234,12 @@ export default function MaterialUploadPage() {
             )}
 
           {/* Action Button */}
-          {result.success && (
+          {result.invoice && (
             <div className="mt-6 flex space-x-4">
               <button
                 onClick={() => {
                   // Navigate to KPI dashboard
-                  window.location.href = "/dashboard/analytics";
+                  window.location.href = "/kpi_analytics";
                 }}
                 className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium"
               >

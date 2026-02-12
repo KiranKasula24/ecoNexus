@@ -27,13 +27,20 @@ function isQualityGrade(value: string): value is QualityGrade {
 export async function createPassportFromWasteStream(
   wasteStream: WasteStreamRow,
 ): Promise<PassportRow> {
+
+  // Validate material_id exists
+  const materialId = requireValue(
+    wasteStream.material_id,
+    `Waste stream ${wasteStream.id} is missing material_id`,
+  );
+
   // Fetch material data
   const { data: material, error: materialError } = await (supabase
     .from("materials")
     .select(
       "id, material_category, material_subtype, physical_form, unit, carbon_footprint, technical_properties",
     )
-    .eq("id", wasteStream.material_id)
+    .eq("id", materialId)
     .single() as any);
 
   if (materialError) {

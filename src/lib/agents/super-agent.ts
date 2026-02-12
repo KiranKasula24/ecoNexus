@@ -1,9 +1,15 @@
 /**
- * NEXAAPEX - SUPER AGENT (LOCALITY COORDINATOR)
- * Detects symbiosis patterns and announces opportunities
+ * NEXAAPEX - SUPER AGENT (UPDATED WITH FULL COORDINATION)
+ * Gap #1: Multi-Party Deal Structuring - IMPLEMENTED
+ * Gap #5: Cross-Locality Coordination - IMPLEMENTED
  */
 
 import { supabase } from "@/lib/database/supabase";
+import {
+  MultiPartyCoordinator,
+  SymbiosisOpportunity,
+} from "./multi-party-coordinator";
+import { CrossLocalityCoordinator } from "./cross-locality-coordinator";
 
 const supabaseAdmin = supabase;
 
@@ -31,13 +37,13 @@ export class SuperAgent {
       const symbioses = await this.detectSymbiosis(flows);
       actions.push(`Detected ${symbioses.length} symbiosis patterns`);
 
-      // Step 3: Announce high-value opportunities
-      const announced = await this.announceSymbioses(symbioses);
-      actions.push(`Announced ${announced} symbiosis opportunities`);
+      // Step 3: Announce AND STRUCTURE high-value opportunities (GAP #1)
+      const structured = await this.structureSymbioses(symbioses);
+      actions.push(`Structured ${structured} multi-party deals`);
 
-      // Step 4: Cross-locality coordination
-      const crossLocalityOpps = await this.coordinateCrossLocality();
-      actions.push(`Found ${crossLocalityOpps} cross-locality opportunities`);
+      // Step 4: Cross-locality coordination (GAP #5)
+      const crossLocalityDeals = await this.coordinateCrossLocality();
+      actions.push(`Coordinated ${crossLocalityDeals} cross-locality deals`);
     } catch (error: any) {
       errors.push(error.message);
     }
@@ -87,8 +93,8 @@ export class SuperAgent {
   /**
    * Detect circular symbiosis patterns (3+ companies)
    */
-  private async detectSymbiosis(flows: any[]): Promise<any[]> {
-    const symbioses: any[] = [];
+  private async detectSymbiosis(flows: any[]): Promise<SymbiosisOpportunity[]> {
+    const symbioses: SymbiosisOpportunity[] = [];
 
     // Simple 3-way pattern detection: A produces X, B needs X and produces Y, C needs Y
     for (let i = 0; i < flows.length; i++) {
@@ -141,6 +147,30 @@ export class SuperAgent {
                 carbonSaved >= 50; // 50 tons CO₂/year
 
               if (meetsCriteria) {
+                // Build detailed flows for structuring
+                const detailedFlows = [
+                  {
+                    from_company_id: companyA.company_id,
+                    to_company_id: companyB.company_id,
+                    material_category: outputA.material_category,
+                    volume: Math.min(
+                      outputA.monthly_volume,
+                      matchingInputB.monthly_volume,
+                    ),
+                    price: 100, // Placeholder
+                  },
+                  {
+                    from_company_id: companyB.company_id,
+                    to_company_id: companyC.company_id,
+                    material_category: outputB.material_category,
+                    volume: Math.min(
+                      outputB.monthly_volume,
+                      matchingInputC.monthly_volume,
+                    ),
+                    price: 100,
+                  },
+                ];
+
                 symbioses.push({
                   companies: [
                     companyA.company_name,
@@ -161,6 +191,7 @@ export class SuperAgent {
                     carbonSaved * 300 * 0.3 +
                     3 * 1000 * 0.2 +
                     100 * 0.1,
+                  flows: detailedFlows,
                 });
               }
             }
@@ -174,66 +205,94 @@ export class SuperAgent {
   }
 
   /**
-   * Announce symbiosis opportunities to locality
+   * Structure symbioses into actual multi-party deals (GAP #1 SOLUTION)
    */
-  private async announceSymbioses(symbioses: any[]): Promise<number> {
-    let announced = 0;
+  private async structureSymbioses(
+    symbioses: SymbiosisOpportunity[],
+  ): Promise<number> {
+    let structured = 0;
 
     for (const symbiosis of symbioses) {
-      // Check if already announced
-      const { data: existingAnnouncement } = await supabaseAdmin
-        .from("agent_feed")
+      // Check if already structured
+      const { data: existingDeal } = await supabaseAdmin
+        .from("multi_party_deals")
         .select("id")
-        .eq("agent_id", this.agentId)
-        .eq("post_type", "announcement")
-        .contains("content", { companies_involved: symbiosis.companies })
-        .eq("is_active", true)
+        .contains("participating_company_ids", symbiosis.company_ids)
+        .in("status", ["proposed", "partial_approval", "all_approved"])
         .single();
 
-      if (existingAnnouncement) continue;
+      if (existingDeal) continue;
 
-      const { error } = await supabaseAdmin.from("agent_feed").insert({
-        agent_id: this.agentId,
-        post_type: "announcement",
-        content: {
-          type: "symbiosis_detected",
-          title: `Circular Opportunity: ${symbiosis.companies.length}-Way Symbiosis`,
-          description: `${symbiosis.companies.join(" → ")} can create a circular material flow for ${symbiosis.flow}`,
-          companies_involved: symbiosis.companies,
-          company_ids: symbiosis.company_ids,
-          estimated_value: symbiosis.estimated_value,
-          carbon_saved: symbiosis.carbon_saved,
-          annual_volume: symbiosis.annual_volume,
-          priority: symbiosis.score > 100000 ? "high" : "medium",
-        },
-        locality: this.locality,
-        visibility: "local",
-        expires_at: new Date(
-          Date.now() + 60 * 24 * 60 * 60 * 1000,
-        ).toISOString(),
-      });
+      // USE NEW MULTI-PARTY COORDINATOR!
+      const multiPartyDeal = await MultiPartyCoordinator.structureDeal(
+        symbiosis,
+        this.agentId,
+      );
 
-      if (!error) announced++;
+      if (multiPartyDeal) {
+        structured++;
+        console.log(
+          `✅ NexaApex structured ${symbiosis.companies.length}-party deal worth €${Math.round(multiPartyDeal.total_value).toLocaleString()}/year`,
+        );
+      }
     }
 
-    return announced;
+    return structured;
   }
 
   /**
-   * Coordinate with other NexaApex agents (cross-locality)
+   * Coordinate with other NexaApex agents (GAP #5 SOLUTION)
    */
   private async coordinateCrossLocality(): Promise<number> {
-    // Find other NexaApex agents
-    const { data: otherSuperAgents } = await supabaseAdmin
-      .from("agents")
-      .select("id, locality")
-      .eq("agent_type", "super")
-      .neq("locality", this.locality);
+    console.log(
+      `🌐 ${this.locality} NexaApex: Starting cross-locality coordination...`,
+    );
 
-    if (!otherSuperAgents) return 0;
+    // Use new Cross-Locality Coordinator
+    const { surpluses, deficits, matches } =
+      await CrossLocalityCoordinator.analyzeCrossLocalityOpportunities();
 
-    // TODO: Implement cross-locality coordination
-    // For MVP, just detect existence
-    return otherSuperAgents.length;
+    let dealsNegotiated = 0;
+
+    // For each match, negotiate deal
+    for (const match of matches) {
+      // Skip if we're not involved in this match
+      if (
+        match.surplus.super_agent_id !== this.agentId &&
+        match.deficit.super_agent_id !== this.agentId
+      ) {
+        continue;
+      }
+
+      // Check if already negotiated
+      const { data: existingDeal } = await supabaseAdmin
+        .from("cross_locality_deals")
+        .select("id")
+        .eq("source_locality", match.surplus.locality)
+        .eq("destination_locality", match.deficit.locality)
+        .eq("material_category", match.surplus.material_category)
+        .in("status", ["proposed", "negotiating", "agreed"])
+        .single();
+
+      if (existingDeal) continue;
+
+      // Negotiate cross-locality deal
+      const deal = await CrossLocalityCoordinator.negotiateCrossLocalityDeal(
+        match.surplus,
+        match.deficit,
+      );
+
+      if (deal) {
+        dealsNegotiated++;
+        console.log(
+          `✅ Cross-locality deal: ${match.surplus.locality} → ${match.deficit.locality} (${match.surplus.material_category})`,
+        );
+      }
+    }
+
+    console.log(
+      `📊 ${this.locality} NexaApex coordinated ${dealsNegotiated} cross-locality deals`,
+    );
+    return dealsNegotiated;
   }
 }

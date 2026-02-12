@@ -4,7 +4,7 @@ import {
   InvoiceLineItem,
   IdentifiedMaterial,
 } from "@/types/material";
-import { findMaterial, normalizeUnit } from "@/lib/constants/material-database";
+import { getMaterialProperties } from "@/lib/constants/material-database";
 
 // ============================================
 // INVOICE PARSING ENGINE
@@ -169,7 +169,8 @@ function extractMaterialNames(text: string): string[] {
 
   for (const line of lines) {
     // Check if line contains known material names
-    const material = findMaterial(line);
+    const material = getMaterialProperties(line);
+
     if (material && !materials.includes(material.name)) {
       materials.push(material.name);
     }
@@ -200,14 +201,48 @@ function extractTotalAmount(text: string): number | undefined {
 // ============================================
 // MATERIAL IDENTIFICATION
 // ============================================
+function normalizeUnit(
+  value: number,
+  unit: string,
+): { value: number; unit: string } {
+  const normalized = unit.toLowerCase();
+
+  switch (normalized) {
+    case "ton":
+    case "tons":
+    case "tonne":
+    case "tonnes":
+      return { value: value * 1000, unit: "kg" };
+
+    case "kg":
+    case "kilogram":
+    case "kilograms":
+      return { value, unit: "kg" };
+
+    case "g":
+    case "gram":
+    case "grams":
+      return { value: value / 1000, unit: "kg" };
+
+    case "lb":
+    case "lbs":
+      return { value: value * 0.453592, unit: "kg" };
+
+    default:
+      return { value, unit };
+  }
+}
 
 function identifyMaterials(parsed: ParsedInvoiceData): IdentifiedMaterial[] {
   const identified: IdentifiedMaterial[] = [];
+  const identifiedMaterialIds = new Set<string>();
 
   for (const item of parsed.line_items) {
-    const material = findMaterial(item.description);
+    const material = getMaterialProperties(item.description);
 
-    if (material) {
+    if (material && !identifiedMaterialIds.has(material.material_id)) {
+      identifiedMaterialIds.add(material.material_id);
+
       // Determine if input or output based on context
       // Simple heuristic: if price is positive, it's likely an input (purchase)
       const category =

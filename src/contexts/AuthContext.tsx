@@ -36,7 +36,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const data = await getCurrentUser();
       if (data && data.company?.user_id) {
         setUser(data.user);
-        setCompany(data.company as Company);
+        setCompany(data.company as unknown as Company);
       } else {
         setUser(null);
         setCompany(null);

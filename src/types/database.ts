@@ -274,6 +274,78 @@ export type Database = {
           },
         ]
       }
+      cross_locality_deals: {
+        Row: {
+          activated_at: string | null
+          coordination_fee_percentage: number | null
+          created_at: string | null
+          destination_locality: string
+          destination_super_agent_id: string
+          id: string
+          material_category: string
+          participating_companies: Json
+          price_per_unit: number
+          source_locality: string
+          source_super_agent_id: string
+          status: string
+          total_annual_value: number
+          transport_cost_per_unit: number
+          updated_at: string | null
+          volume_tons_month: number
+        }
+        Insert: {
+          activated_at?: string | null
+          coordination_fee_percentage?: number | null
+          created_at?: string | null
+          destination_locality: string
+          destination_super_agent_id: string
+          id?: string
+          material_category: string
+          participating_companies: Json
+          price_per_unit: number
+          source_locality: string
+          source_super_agent_id: string
+          status?: string
+          total_annual_value: number
+          transport_cost_per_unit: number
+          updated_at?: string | null
+          volume_tons_month: number
+        }
+        Update: {
+          activated_at?: string | null
+          coordination_fee_percentage?: number | null
+          created_at?: string | null
+          destination_locality?: string
+          destination_super_agent_id?: string
+          id?: string
+          material_category?: string
+          participating_companies?: Json
+          price_per_unit?: number
+          source_locality?: string
+          source_super_agent_id?: string
+          status?: string
+          total_annual_value?: number
+          transport_cost_per_unit?: number
+          updated_at?: string | null
+          volume_tons_month?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cross_locality_deals_destination_super_agent_id_fkey"
+            columns: ["destination_super_agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cross_locality_deals_source_super_agent_id_fkey"
+            columns: ["source_super_agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       deals: {
         Row: {
           agent_reasoning: string | null
@@ -289,6 +361,7 @@ export type Database = {
           id: string
           material_category: string
           material_subtype: string
+          multi_party_deal_id: string | null
           negotiation_rounds: number | null
           negotiation_thread_id: string | null
           passport_id: string
@@ -320,6 +393,7 @@ export type Database = {
           id?: string
           material_category: string
           material_subtype: string
+          multi_party_deal_id?: string | null
           negotiation_rounds?: number | null
           negotiation_thread_id?: string | null
           passport_id: string
@@ -351,6 +425,7 @@ export type Database = {
           id?: string
           material_category?: string
           material_subtype?: string
+          multi_party_deal_id?: string | null
           negotiation_rounds?: number | null
           negotiation_thread_id?: string | null
           passport_id?: string
@@ -381,6 +456,13 @@ export type Database = {
             columns: ["buyer_company_id"]
             isOneToOne: false
             referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deals_multi_party_deal_id_fkey"
+            columns: ["multi_party_deal_id"]
+            isOneToOne: false
+            referencedRelation: "multi_party_deals"
             referencedColumns: ["id"]
           },
           {
@@ -584,9 +666,11 @@ export type Database = {
           material_category: string
           material_subtype: string
           physical_form: string
+          previous_owner_company_id: string | null
           quality_grade: string | null
           quality_tier: number | null
           technical_properties: Json | null
+          transfer_date: string | null
           unit: string
           updated_at: string | null
           verification_provider: string | null
@@ -605,9 +689,11 @@ export type Database = {
           material_category: string
           material_subtype: string
           physical_form: string
+          previous_owner_company_id?: string | null
           quality_grade?: string | null
           quality_tier?: number | null
           technical_properties?: Json | null
+          transfer_date?: string | null
           unit: string
           updated_at?: string | null
           verification_provider?: string | null
@@ -626,9 +712,11 @@ export type Database = {
           material_category?: string
           material_subtype?: string
           physical_form?: string
+          previous_owner_company_id?: string | null
           quality_grade?: string | null
           quality_tier?: number | null
           technical_properties?: Json | null
+          transfer_date?: string | null
           unit?: string
           updated_at?: string | null
           verification_provider?: string | null
@@ -641,6 +729,13 @@ export type Database = {
           {
             foreignKeyName: "material_passports_current_owner_company_id_fkey"
             columns: ["current_owner_company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "material_passports_previous_owner_company_id_fkey"
+            columns: ["previous_owner_company_id"]
             isOneToOne: false
             referencedRelation: "companies"
             referencedColumns: ["id"]
@@ -709,6 +804,65 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      multi_party_deals: {
+        Row: {
+          activated_at: string | null
+          approvals: Json
+          carbon_savings_tons_year: number
+          coordination_fee_percentage: number | null
+          coordinator_agent_id: string | null
+          created_at: string | null
+          flows: Json
+          id: string
+          participating_company_ids: string[]
+          proposal_expires_at: string | null
+          status: string
+          total_annual_value: number
+          updated_at: string | null
+          value_distribution: Json
+        }
+        Insert: {
+          activated_at?: string | null
+          approvals: Json
+          carbon_savings_tons_year: number
+          coordination_fee_percentage?: number | null
+          coordinator_agent_id?: string | null
+          created_at?: string | null
+          flows: Json
+          id?: string
+          participating_company_ids: string[]
+          proposal_expires_at?: string | null
+          status?: string
+          total_annual_value: number
+          updated_at?: string | null
+          value_distribution: Json
+        }
+        Update: {
+          activated_at?: string | null
+          approvals?: Json
+          carbon_savings_tons_year?: number
+          coordination_fee_percentage?: number | null
+          coordinator_agent_id?: string | null
+          created_at?: string | null
+          flows?: Json
+          id?: string
+          participating_company_ids?: string[]
+          proposal_expires_at?: string | null
+          status?: string
+          total_annual_value?: number
+          updated_at?: string | null
+          value_distribution?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "multi_party_deals_coordinator_agent_id_fkey"
+            columns: ["coordinator_agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
             referencedColumns: ["id"]
           },
         ]
@@ -879,6 +1033,74 @@ export type Database = {
           },
         ]
       }
+      passport_transfers: {
+        Row: {
+          created_at: string | null
+          deal_id: string | null
+          from_company_id: string
+          id: string
+          notes: string | null
+          passport_id: string
+          price_per_unit: number | null
+          to_company_id: string
+          transfer_date: string
+          volume: number
+        }
+        Insert: {
+          created_at?: string | null
+          deal_id?: string | null
+          from_company_id: string
+          id?: string
+          notes?: string | null
+          passport_id: string
+          price_per_unit?: number | null
+          to_company_id: string
+          transfer_date?: string
+          volume: number
+        }
+        Update: {
+          created_at?: string | null
+          deal_id?: string | null
+          from_company_id?: string
+          id?: string
+          notes?: string | null
+          passport_id?: string
+          price_per_unit?: number | null
+          to_company_id?: string
+          transfer_date?: string
+          volume?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "passport_transfers_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "deals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "passport_transfers_from_company_id_fkey"
+            columns: ["from_company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "passport_transfers_passport_id_fkey"
+            columns: ["passport_id"]
+            isOneToOne: false
+            referencedRelation: "material_passports"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "passport_transfers_to_company_id_fkey"
+            columns: ["to_company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       processor_profiles: {
         Row: {
           certifications: string[] | null
@@ -1001,6 +1223,103 @@ export type Database = {
             foreignKeyName: "recycler_profiles_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: true
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      three_way_deals: {
+        Row: {
+          activated_at: string | null
+          buyer_approved: boolean | null
+          buyer_approved_at: string | null
+          buyer_company_id: string
+          buyer_price_per_ton: number
+          created_at: string | null
+          id: string
+          material_in: string
+          material_out: string
+          processing_fee_per_ton: number
+          processing_time_days: number | null
+          processor_approved: boolean | null
+          processor_approved_at: string | null
+          processor_company_id: string
+          status: string
+          supplier_approved: boolean | null
+          supplier_approved_at: string | null
+          supplier_company_id: string
+          supplier_price_per_ton: number
+          total_value_annual: number
+          updated_at: string | null
+          volume_tons_month: number
+        }
+        Insert: {
+          activated_at?: string | null
+          buyer_approved?: boolean | null
+          buyer_approved_at?: string | null
+          buyer_company_id: string
+          buyer_price_per_ton: number
+          created_at?: string | null
+          id?: string
+          material_in: string
+          material_out: string
+          processing_fee_per_ton: number
+          processing_time_days?: number | null
+          processor_approved?: boolean | null
+          processor_approved_at?: string | null
+          processor_company_id: string
+          status?: string
+          supplier_approved?: boolean | null
+          supplier_approved_at?: string | null
+          supplier_company_id: string
+          supplier_price_per_ton: number
+          total_value_annual: number
+          updated_at?: string | null
+          volume_tons_month: number
+        }
+        Update: {
+          activated_at?: string | null
+          buyer_approved?: boolean | null
+          buyer_approved_at?: string | null
+          buyer_company_id?: string
+          buyer_price_per_ton?: number
+          created_at?: string | null
+          id?: string
+          material_in?: string
+          material_out?: string
+          processing_fee_per_ton?: number
+          processing_time_days?: number | null
+          processor_approved?: boolean | null
+          processor_approved_at?: string | null
+          processor_company_id?: string
+          status?: string
+          supplier_approved?: boolean | null
+          supplier_approved_at?: string | null
+          supplier_company_id?: string
+          supplier_price_per_ton?: number
+          total_value_annual?: number
+          updated_at?: string | null
+          volume_tons_month?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "three_way_deals_buyer_company_id_fkey"
+            columns: ["buyer_company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "three_way_deals_processor_company_id_fkey"
+            columns: ["processor_company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "three_way_deals_supplier_company_id_fkey"
+            columns: ["supplier_company_id"]
+            isOneToOne: false
             referencedRelation: "companies"
             referencedColumns: ["id"]
           },
