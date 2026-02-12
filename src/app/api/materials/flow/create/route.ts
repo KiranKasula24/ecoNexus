@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
 import { createPassportFromWasteStream } from "@/lib/material-intelligence/passport-service";
+import { generateMaterialFlowOpportunities } from "@/lib/material-intelligence/opportunity-engine";
 
 type WasteClassification =
   | "reusable"
@@ -242,12 +243,37 @@ export async function POST(request: NextRequest) {
 
     const passport = await createPassportFromWasteStream(wasteStream);
 
+    const circularOpportunities = generateMaterialFlowOpportunities({
+      primaryMaterials: body.primaryMaterials,
+      wasteGenerated: body.wasteGenerated,
+    });
+
+    const mergedTechnicalProperties = {
+      ...((passport.technical_properties as Record<string, unknown> | null) || {}),
+      circular_opportunities: circularOpportunities,
+    };
+
+    const { data: updatedPassport, error: passportUpdateError } = await supabase
+      .from("material_passports")
+      .update({ technical_properties: mergedTechnicalProperties })
+      .eq("id", passport.id)
+      .select("*")
+      .single();
+
+    if (passportUpdateError) {
+      return NextResponse.json(
+        { error: `Failed to store opportunities on passport: ${passportUpdateError.message}` },
+        { status: 500 },
+      );
+    }
+
     return NextResponse.json({
       success: true,
       primary_materials: insertedPrimaryMaterials || [],
       waste_material: wasteMaterial,
       waste_stream: wasteStream,
-      passport,
+      passport: updatedPassport,
+      circular_opportunities: circularOpportunities,
     });
   } catch (error: unknown) {
     console.error("Material flow create error:", error);

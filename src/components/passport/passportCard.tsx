@@ -31,6 +31,25 @@ type PassportRecord = {
   verification_status: string | null;
   verification_score: number | null;
   verification_provider: string | null;
+  technical_properties?: {
+    circular_opportunities?: {
+      focus?: string;
+      selfReuseOpportunities?: Array<{
+        id: string;
+        title: string;
+        description: string;
+        expectedImpact: string;
+        feasibility: "high" | "medium" | "low";
+      }>;
+      alternateInputRoutes?: Array<{
+        id: string;
+        title: string;
+        description: string;
+        expectedImpact: string;
+        feasibility: "high" | "medium" | "low";
+      }>;
+    };
+  } | null;
   created_at: string | null;
   updated_at: string | null;
 };
@@ -56,6 +75,9 @@ export function PassportCard({ passportId }: PassportCardProps) {
     if (!passport?.created_at) return "N/A";
     return new Date(passport.created_at).toLocaleString();
   }, [passport?.created_at]);
+
+  const circularOpportunities =
+    passport?.technical_properties?.circular_opportunities;
 
   const fetchPassport = useCallback(async () => {
     const res = await fetch(`/api/digital-passport/${passportId}`);
@@ -272,6 +294,55 @@ export function PassportCard({ passportId }: PassportCardProps) {
           </p>
         </div>
       </div>
+
+      {circularOpportunities && (
+        <div className="border rounded-lg shadow-lg p-6 bg-white space-y-4">
+          <div>
+            <h3 className="text-lg font-semibold">
+              Circular Opportunities ({circularOpportunities.focus || "general"})
+            </h3>
+            <p className="text-sm text-gray-600">
+              Suggested pathways generated after material flow analysis.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <h4 className="font-medium text-gray-900">Self-Reuse Pathways</h4>
+              {(circularOpportunities.selfReuseOpportunities || []).length === 0 ? (
+                <p className="text-sm text-gray-500">No specific self-reuse pathways.</p>
+              ) : (
+                (circularOpportunities.selfReuseOpportunities || []).map((opp) => (
+                  <div key={opp.id} className="border rounded-md p-3">
+                    <p className="font-medium text-sm">{opp.title}</p>
+                    <p className="text-xs text-gray-600 mt-1">{opp.description}</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Impact: {opp.expectedImpact}
+                    </p>
+                  </div>
+                ))
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <h4 className="font-medium text-gray-900">Alternate Input Routes</h4>
+              {(circularOpportunities.alternateInputRoutes || []).length === 0 ? (
+                <p className="text-sm text-gray-500">No alternate input routes.</p>
+              ) : (
+                (circularOpportunities.alternateInputRoutes || []).map((opp) => (
+                  <div key={opp.id} className="border rounded-md p-3">
+                    <p className="font-medium text-sm">{opp.title}</p>
+                    <p className="text-xs text-gray-600 mt-1">{opp.description}</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Impact: {opp.expectedImpact}
+                    </p>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="border rounded-lg shadow-lg p-6 bg-white space-y-4">
         <h3 className="text-lg font-semibold">Upload Verification Evidence</h3>

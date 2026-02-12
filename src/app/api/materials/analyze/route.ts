@@ -6,6 +6,7 @@ import {
   calculateMaterialFlowTotals,
   getPeriodStart,
 } from "@/lib/calculations/material-flow";
+import { generateMaterialFlowOpportunitiesFromTypes } from "@/lib/material-intelligence/opportunity-engine";
 import type { Database } from "@/types/database";
 import type { IdentifiedMaterial, ParsedInvoiceData } from "@/types/material";
 
@@ -97,11 +98,15 @@ export async function POST(req: Request) {
     insertedMaterials || [],
     insertedWaste || [],
   );
+  const circularOpportunities = generateMaterialFlowOpportunitiesFromTypes({
+    materialTypes: materials.map((m) => m.material_type),
+  });
 
   return NextResponse.json({
     period: periodStart,
     materials: insertedMaterials,
     waste_streams: insertedWaste,
     totals,
+    circular_opportunities: circularOpportunities,
   });
 }
