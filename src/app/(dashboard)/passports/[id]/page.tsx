@@ -1,11 +1,11 @@
-import { PassportCard } from "@/components/passport/passportCard";
+﻿import { PassportCard } from "@/components/passport/passportCard";
 
 export default async function PassportPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  // ✅ Must await params in Next 16
+  //  Must await params in Next 16
   const { id } = await params;
 
   
@@ -15,3 +15,4 @@ export default async function PassportPage({
     </div>
   );
 }
+

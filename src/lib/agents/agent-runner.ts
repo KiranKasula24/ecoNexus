@@ -1,4 +1,4 @@
-/**
+﻿/**
  * AGENT RUNNER - ORCHESTRATES ALL AGENT TYPES
  * Runs Nexa, NexaPrime (Recycler/Processor/Logistics), and NexaApex
  */
@@ -24,9 +24,49 @@ type FeedContent = {
     volume: number;
     terms?: string;
   };
+  negotiation_context?: {
+    round: number;
+    against_post_id?: string;
+    against_price?: number;
+    against_volume?: number;
+    material?: string;
+  };
 };
 
 export class AgentRunner {
+  private static pick<T>(items: T[]): T {
+    return items[Math.floor(Math.random() * items.length)];
+  }
+
+  private static formatMaterialLabel(content: any): string {
+    return (
+      content?.material_subtype ||
+      content?.material_category ||
+      content?.material ||
+      "material"
+    );
+  }
+
+  private static openingMessage(material: string): string {
+    const templates = [
+      `We can buy ${material} if quality checks out.`,
+      `We have demand for ${material}; sharing a first counter.`,
+      `Interested in ${material}. Sending commercial terms.`,
+      `We can take this ${material} lot. Please review this offer.`,
+    ];
+    return this.pick(templates);
+  }
+
+  private static counterMessage(round: number, material: string): string {
+    const templates = [
+      `Round ${round}: revising price for ${material}.`,
+      `Counter ${round}: updated commercial terms for ${material}.`,
+      `Round ${round}: aligning on ${material} economics.`,
+      `Counter ${round}: proposing adjusted terms for ${material}.`,
+    ];
+    return this.pick(templates);
+  }
+
   /**
    * Run all active agents
    */
@@ -42,7 +82,7 @@ export class AgentRunner {
       errors: string[];
     };
   }> {
-    console.log("🤖 Starting agent execution cycle...");
+    console.log(" Starting agent execution cycle...");
 
     const stats = {
       total_agents: 0,
@@ -66,7 +106,7 @@ export class AgentRunner {
       }
 
       if (!agents || agents.length === 0) {
-        console.log("⚠️ No active agents found");
+        console.log(" No active agents found");
         return {
           success: true,
           stats: { ...stats, total_agents: 0 },
@@ -74,12 +114,12 @@ export class AgentRunner {
       }
 
       stats.total_agents = agents.length;
-      console.log(`📊 Found ${agents.length} active agents`);
+      console.log(` Found ${agents.length} active agents`);
 
       // Run each agent based on type
       for (const agent of agents) {
         try {
-          console.log(`🔄 Running ${agent.agent_type} agent: ${agent.name}`);
+          console.log(` Running ${agent.agent_type} agent: ${agent.name}`);
 
           let result: { actions: number; errors: string[] };
 
@@ -144,7 +184,7 @@ export class AgentRunner {
               break;
 
             default:
-              console.log(`⚠️ Unknown agent type: ${agent.agent_type}`);
+              console.log(` Unknown agent type: ${agent.agent_type}`);
               continue;
           }
 
@@ -157,20 +197,20 @@ export class AgentRunner {
             );
           }
 
-          console.log(`✅ ${agent.name} completed: ${result.actions} actions`);
+          console.log(` ${agent.name} completed: ${result.actions} actions`);
         } catch (agentError: any) {
-          console.error(`❌ Error running ${agent.name}:`, agentError);
+          console.error(` Error running ${agent.name}:`, agentError);
           stats.errors.push(`${agent.name}: ${agentError.message}`);
         }
       }
 
       // Run negotiation engine to process ongoing threads
-      console.log("🤝 Processing negotiations...");
+      console.log(" Processing negotiations...");
       await this.processNegotiations();
 
-      console.log("✅ Agent cycle complete");
+      console.log(" Agent cycle complete");
       console.log(
-        `📊 Stats: ${stats.agents_run}/${stats.total_agents} agents run, ${stats.total_actions} total actions`,
+        ` Stats: ${stats.agents_run}/${stats.total_agents} agents run, ${stats.total_actions} total actions`,
       );
 
       return {
@@ -178,7 +218,7 @@ export class AgentRunner {
         stats,
       };
     } catch (error: any) {
-      console.error("❌ Agent runner failed:", error);
+      console.error(" Agent runner failed:", error);
       return {
         success: false,
         stats: {
@@ -196,7 +236,7 @@ export class AgentRunner {
    * Process ongoing negotiations + start new ones
    */
   private static async processNegotiations(): Promise<void> {
-    // 1️⃣ Get active offers from last 24h
+    // 1 Get active offers from last 24h
     const { data: offers } = await supabase
       .from("agent_feed")
       .select("*")
@@ -217,7 +257,7 @@ export class AgentRunner {
           .select("*", { count: "exact", head: true })
           .eq("thread_root_id", offer.id);
 
-        // If no replies → start negotiation
+        // If no replies  start negotiation
         if (!replyCount || replyCount === 0) {
           await this.startNegotiation(offer);
           continue;
@@ -255,17 +295,26 @@ export class AgentRunner {
       max_rounds: 3,
     });
 
+    const materialLabel = this.formatMaterialLabel(offer.content);
+
     await supabase.from("agent_feed").insert({
       agent_id: respondingAgent.id,
       post_type: "reply",
       parent_id: offer.id,
       thread_root_id: offer.id,
       content: {
-        message: `We are interested in your ${materialCategory}.`,
+        message: this.openingMessage(materialLabel),
         counter_offer: {
           price: Math.round(counterPrice * 100) / 100,
           volume: offer.content.volume,
           terms: "Pickup included",
+        },
+        negotiation_context: {
+          round: 1,
+          against_post_id: offer.id,
+          against_price: askingPrice,
+          against_volume: offer.content.volume,
+          material: materialLabel,
         },
         interest_level: "medium",
       },
@@ -273,7 +322,7 @@ export class AgentRunner {
       visibility: offer.visibility,
     });
 
-    console.log(`💬 Started negotiation on offer ${offer.id}`);
+    console.log(` Started negotiation on offer ${offer.id}`);
   }
   /**
    * Continue negotiation rounds
@@ -298,22 +347,13 @@ export class AgentRunner {
     // Prevent infinite loops if thread already inactive
     if (!originalPost.is_active) return;
 
-    // Count negotiation rounds
-    const roundCount = Math.floor(messages.length / 2);
-
-    // Stop after 3 back-and-forth rounds (6 messages)
-    if (messages.length >= 6) {
-      const converging = await this.isNegotiationConverging(threadRootId);
-
-      if (converging) {
-        await this.proposeDealFromThread(messages);
-      } else {
-        await supabase
-          .from("agent_feed")
-          .update({ is_active: false })
-          .eq("thread_root_id", threadRootId);
-      }
-
+    const replyCount = messages.filter((m) => m.post_type === "reply").length;
+    if (replyCount >= 3) {
+      await this.proposeDealFromThread(messages);
+      await supabase
+        .from("agent_feed")
+        .update({ is_active: false })
+        .eq("thread_root_id", threadRootId);
       return;
     }
 
@@ -339,9 +379,11 @@ export class AgentRunner {
     const newPrice = ScoringEngine.calculateCounterOffer({
       original_price: lastPrice,
       target_price: originalPrice,
-      round: roundCount + 1,
+      round: replyCount + 1,
       max_rounds: 3,
     });
+
+    const materialLabel = this.formatMaterialLabel(originalContent);
 
     await supabase.from("agent_feed").insert({
       agent_id: nextAgentId,
@@ -349,13 +391,20 @@ export class AgentRunner {
       parent_id: lastMessage.id,
       thread_root_id: threadRootId,
       content: {
-        message: `Counter-offer round ${roundCount + 1}`,
+        message: this.counterMessage(replyCount + 1, materialLabel),
         counter_offer: {
           price: Math.round(newPrice * 100) / 100,
           volume: lastContent?.counter_offer?.volume,
           terms: "30 days payment",
         },
-        interest_level: roundCount >= 2 ? "high" : "medium",
+        negotiation_context: {
+          round: replyCount + 1,
+          against_post_id: lastMessage.id,
+          against_price: lastPrice,
+          against_volume: lastContent?.counter_offer?.volume || lastContent?.volume,
+          material: materialLabel,
+        },
+        interest_level: replyCount >= 2 ? "high" : "medium",
       },
       locality: originalPost.locality,
       visibility: originalPost.visibility,
@@ -367,6 +416,25 @@ export class AgentRunner {
     materialCategory: string,
     excludeAgentId: string,
   ): Promise<any[]> {
+    const { data: demandPosts } = await supabase
+      .from("agent_feed")
+      .select("agent_id, content")
+      .eq("post_type", "request")
+      .eq("is_active", true);
+
+    const demandAgentIds = new Set(
+      (demandPosts || [])
+        .filter((p: any) => {
+          const c = p.content || {};
+          const key =
+            c.material_id || c.sku || c.material_subtype || c.material_category || "";
+          return key.toLowerCase().includes((materialCategory || "").toLowerCase());
+        })
+        .map((p: any) => p.agent_id),
+    );
+
+    if (demandAgentIds.size === 0) return [];
+
     const { data: activeAgents } = await supabase
       .from("agents")
       .select("*")
@@ -378,6 +446,8 @@ export class AgentRunner {
     const needle = (materialCategory || "").toLowerCase();
 
     return activeAgents.filter((agent) => {
+      if (!demandAgentIds.has(agent.id)) return false;
+
       const constraints = (agent.constraints || {}) as Record<string, any>;
 
       // Recycler
@@ -435,31 +505,6 @@ export class AgentRunner {
   }
 
   /**
-   * Check if negotiation is converging
-   */
-  private static async isNegotiationConverging(
-    threadRootId: string,
-  ): Promise<boolean> {
-    const { data: messages } = await supabase
-      .from("agent_feed")
-      .select("content")
-      .eq("thread_root_id", threadRootId)
-      .order("created_at", { ascending: true });
-
-    if (!messages || messages.length < 2) return false;
-
-    // Get first and last counter-offers
-    const firstContent = messages[0].content as FeedContent;
-    const lastContent = messages[messages.length - 1].content as FeedContent;
-    const firstOffer = firstContent?.counter_offer?.price || 0;
-    const lastOffer = lastContent?.counter_offer?.price || 0;
-
-    // If offers are within 10% of each other, converging
-    const gap = Math.abs(firstOffer - lastOffer) / firstOffer;
-    return gap < 0.1;
-  }
-
-  /**
    * Propose deal from negotiation
    */
   private static async proposeDeal(negotiation: any): Promise<void> {
@@ -513,6 +558,17 @@ export class AgentRunner {
 
     if (!sellerAgent?.company_id || !buyerAgent?.company_id) return;
 
+    const { data: existingThreadDeal } = await supabase
+      .from("deals")
+      .select("id")
+      .eq("negotiation_thread_id", negotiation.thread_root_id)
+      .maybeSingle();
+
+    if (existingThreadDeal?.id) return;
+
+    const roundFromContext = Number(content.negotiation_context?.round || 3);
+    const normalizedRounds = Math.max(1, Math.min(3, roundFromContext));
+
     const dealData = {
       seller_agent_id: sellerAgentId,
       buyer_agent_id: buyerAgentId,
@@ -533,10 +589,9 @@ export class AgentRunner {
       quality_tier: parentContent.quality_tier ?? 2,
       status: "pending_seller_approval",
       negotiation_thread_id: negotiation.thread_root_id,
+      negotiation_rounds: normalizedRounds,
       agent_recommendation: "approved",
-      agent_reasoning: `Negotiated deal after ${
-        Math.floor(Math.random() * 3) + 1
-      } rounds. Price converged to market rate.`,
+      agent_reasoning: `[AUTO_3_ROUNDS] Negotiated through structured rounds with explicit price anchoring and auto-proposed for human approval.`,
     };
 
     const { data: deal, error } = await supabase
@@ -557,7 +612,7 @@ export class AgentRunner {
       thread_root_id: negotiation.thread_root_id,
       content: {
         deal_id: deal.id,
-        summary: `Deal proposed: ${volume} tons ${parentContent.material_category} @ €${price}/ton`,
+        summary: `Deal proposed after ${normalizedRounds} rounds: ${volume} tons ${parentContent.material_category} @ EUR ${price}/ton`,
       },
       locality: parentPost.locality,
       visibility: parentPost.visibility,
@@ -572,22 +627,22 @@ export class AgentRunner {
         company_id: sellerAgent.company_id,
         type: "deal_proposed",
         title: "New Deal Awaiting Approval",
-        message: `Your agent negotiated a deal: ${volume} tons ${parentContent.material_category} @ €${price}/ton`,
+        message: `Your agent negotiated a deal in ${normalizedRounds} rounds: ${volume} tons ${parentContent.material_category} @ EUR ${price}/ton`,
         related_deal_id: deal.id,
-        action_url: `/dashboard/deals/pending`,
+        action_url: `/deals/created`,
       },
       {
         user_id: buyerUserId,
         company_id: buyerAgent.company_id,
         type: "deal_proposed",
         title: "Deal Pending Review",
-        message: `Deal proposed: ${volume} tons ${parentContent.material_category} @ €${price}/ton`,
+        message: `Deal proposed in ${normalizedRounds} rounds: ${volume} tons ${parentContent.material_category} @ EUR ${price}/ton`,
         related_deal_id: deal.id,
-        action_url: `/dashboard/deals/pending`,
+        action_url: `/deals/created`,
       },
     ]);
 
-    console.log(`📝 Deal proposed: ${deal.id}`);
+    console.log(` Deal proposed: ${deal.id}`);
   }
 
   /**
@@ -603,3 +658,5 @@ export class AgentRunner {
     return data?.user_id || "";
   }
 }
+
+

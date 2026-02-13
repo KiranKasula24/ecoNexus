@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -19,6 +19,7 @@ export default function RegisterPage() {
     entityType: "manufacturer" as
       | "manufacturer"
       | "recycler"
+      | "processor"
       | "logistics"
       | "energy_recovery",
     address: "",
@@ -54,7 +55,7 @@ export default function RegisterPage() {
       });
 
       // Success - redirect to dashboard
-      router.push("/dashboard");
+      router.push("/");
     } catch (err: any) {
       console.error("Registration error:", err);
       setError(err.message || "Registration failed. Please try again.");
@@ -223,6 +224,7 @@ export default function RegisterPage() {
               >
                 <option value="manufacturer">Manufacturing Company</option>
                 <option value="recycler">Recycler / Waste Processor</option>
+                <option value="processor">Material Processor</option>
                 <option value="logistics">Logistics Provider</option>
                 <option value="energy_recovery">
                   Energy Recovery Facility
@@ -328,3 +330,4 @@ export default function RegisterPage() {
     </div>
   );
 }
+

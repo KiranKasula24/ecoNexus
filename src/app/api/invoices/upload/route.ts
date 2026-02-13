@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import { createClient } from "@/lib/database/supabase";
 
 export async function POST(req: Request) {
@@ -20,7 +20,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // 1️⃣ Upload file to Supabase Storage
+    // 1 Upload file to Supabase Storage
     const filePath = `company-${company_id}/${Date.now()}-${file.name}`;
 
     const { error: uploadError } = await supabase.storage
@@ -34,14 +34,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: uploadError }, { status: 500 });
     }
 
-    // 2️⃣ Get public URL
+    // 2 Get public URL
     const { data: publicUrlData } = supabase.storage
       .from("invoices")
       .getPublicUrl(filePath);
 
     const file_url = publicUrlData.publicUrl;
 
-    // 3️⃣ Insert invoice metadata into DB
+    // 3 Insert invoice metadata into DB
     const { data, error } = await supabase
       .from("invoices")
       .insert({
@@ -69,3 +69,4 @@ export async function POST(req: Request) {
     );
   }
 }
+

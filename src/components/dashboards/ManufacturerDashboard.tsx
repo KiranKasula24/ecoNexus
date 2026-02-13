@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -123,26 +123,26 @@ export default function ManufacturerDashboard() {
         <StatCard
           title="Materials Tracked"
           value={stats.materials}
-          icon="📦"
-          link="/dashboard/materials/requirements"
+          icon=""
+          link="/materials/requirements"
         />
         <StatCard
           title="Waste Streams"
           value={stats.waste_streams}
-          icon="♻️"
-          link="/dashboard/analytics"
+          icon=""
+          link="/analytics"
         />
         <StatCard
           title="Digital Passports"
           value={stats.passports}
-          icon="🎫"
-          link="/dashboard/passports"
+          icon=""
+          link="/passports"
         />
         <StatCard
           title="Pending Deals"
           value={stats.pending_deals}
-          icon="🤝"
-          link="/dashboard/deals/pending"
+          icon=""
+          link="/deals/pending"
           highlight={stats.pending_deals > 0}
         />
       </div>
@@ -151,56 +151,56 @@ export default function ManufacturerDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Material Requirements */}
         <ActionCard
-          title="📋 Material Requirements"
+          title=" Material Requirements"
           description="Define what materials you need for production"
           actions={[
             {
               label: "Add Requirements",
-              href: "/dashboard/materials/requirements",
+              href: "/materials/requirements",
               primary: true,
             },
-            { label: "Upload Invoice", href: "/dashboard/materials/upload" },
+            { label: "Upload Invoice", href: "/materials/upload" },
           ]}
         />
 
         {/* Circular Opportunities */}
         <ActionCard
-          title="🔄 Circular Opportunities"
+          title=" Circular Opportunities"
           description="Discover cost savings through circular materials"
           actions={[
             {
               label: "View Opportunities",
-              href: "/dashboard/opportunities",
+              href: "/opportunities",
               primary: true,
             },
             {
               label: "Run Simulation",
-              href: "/dashboard/opportunities/simulate",
+              href: "/opportunities/simulate",
             },
           ]}
         />
 
         {/* Nexus Feed */}
         <ActionCard
-          title="💬 Nexus (Agent Marketplace)"
+          title=" Nexus (Agent Marketplace)"
           description="See live negotiations and deals"
           actions={[
-            { label: "Open Nexus", href: "/dashboard/nexus", primary: true },
-            { label: "My Negotiations", href: "/dashboard/nexus?filter=my" },
+            { label: "Open Nexus", href: "/nexus", primary: true },
+            { label: "My Negotiations", href: "/nexus?filter=my" },
           ]}
         />
 
         {/* Analytics & KPIs */}
         <ActionCard
-          title="📊 Analytics & KPIs"
+          title=" Analytics & KPIs"
           description="Track environmental and economic performance"
           actions={[
             {
               label: "View Dashboard",
-              href: "/dashboard/analytics",
+              href: "/analytics",
               primary: true,
             },
-            { label: "Generate Report", href: "/dashboard/analytics/report" },
+            { label: "Generate Report", href: "/analytics/report" },
           ]}
         />
       </div>
@@ -210,7 +210,7 @@ export default function ManufacturerDashboard() {
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">
-              🤖 Your Nexa Agent
+               Your Nexa Agent
             </h2>
             <p className="text-sm text-gray-700 mb-4">
               Nexa continuously scans Nexus for circular opportunities and
@@ -220,7 +220,7 @@ export default function ManufacturerDashboard() {
             {stats.agent_status === "paused" && (
               <div className="bg-yellow-50 border border-yellow-200 rounded p-3 mb-4">
                 <p className="text-sm text-yellow-800">
-                  ⚠️ Your agent is paused. Complete material input to activate
+                   Your agent is paused. Complete material input to activate
                   autonomous negotiations.
                 </p>
               </div>
@@ -232,13 +232,13 @@ export default function ManufacturerDashboard() {
                 disabled={agentCycleRunning}
                 className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
               >
-                {agentCycleRunning ? "Running..." : "▶️ Run Agent Cycle"}
+                {agentCycleRunning ? "Running..." : " Run Agent Cycle"}
               </button>
               <Link
-                href="/dashboard/agent/settings"
+                href="/agent/settings"
                 className="px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium"
               >
-                ⚙️ Configure Nexa
+                 Configure Nexa
               </Link>
             </div>
 
@@ -252,8 +252,8 @@ export default function ManufacturerDashboard() {
               >
                 <p className="text-sm font-medium mb-2">
                   {cycleResult.success
-                    ? "✅ Cycle Complete"
-                    : "❌ Cycle Failed"}
+                    ? " Cycle Complete"
+                    : " Cycle Failed"}
                 </p>
                 <pre className="text-xs overflow-auto">
                   {JSON.stringify(cycleResult.stats, null, 2)}
@@ -263,7 +263,7 @@ export default function ManufacturerDashboard() {
           </div>
 
           <div className="ml-6 text-right">
-            <div className="text-3xl mb-2">🤖</div>
+            <div className="text-3xl mb-2"></div>
             <div className="text-sm text-gray-600">
               Nexa-{company?.name?.slice(0, 15)}
             </div>
@@ -276,20 +276,20 @@ export default function ManufacturerDashboard() {
         <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <QuickLink
-            href="/dashboard/materials/requirements"
+            href="/materials/requirements"
             label="Add Materials"
-            icon="➕"
+            icon=""
           />
           <QuickLink
-            href="/dashboard/materials/upload"
+            href="/materials/upload"
             label="Upload Invoice"
-            icon="📄"
+            icon=""
           />
-          <QuickLink href="/dashboard/nexus" label="Open Nexus" icon="💬" />
+          <QuickLink href="/nexus" label="Open Nexus" icon="" />
           <QuickLink
-            href="/dashboard/deals/pending"
+            href="/deals/pending"
             label="Approve Deals"
-            icon="✅"
+            icon=""
           />
         </div>
       </div>
@@ -365,3 +365,5 @@ function QuickLink({ href, label, icon }: any) {
     </Link>
   );
 }
+
+

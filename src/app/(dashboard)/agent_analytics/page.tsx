@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -98,7 +98,7 @@ export default function DashboardPage() {
         </div>
         <div className="flex gap-3">
           <Link
-            href="/dashboard/materials/flow/create"
+            href="/materials/flow/create"
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
           >
             + Add Material Flow
@@ -108,7 +108,7 @@ export default function DashboardPage() {
             disabled={runningCycle}
             className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 font-medium"
           >
-            {runningCycle ? "Running..." : "🤖 Run Agent Cycle"}
+            {runningCycle ? "Running..." : " Run Agent Cycle"}
           </button>
         </div>
       </div>
@@ -116,7 +116,7 @@ export default function DashboardPage() {
       {/* Quick Actions */}
       <div className="grid grid-cols-4 gap-4">
         <Link
-          href="/dashboard/deals/pending"
+          href="/deals/pending"
           className="bg-orange-50 border-2 border-orange-200 rounded-lg p-4 hover:border-orange-400 transition"
         >
           <div className="flex items-center justify-between">
@@ -128,13 +128,13 @@ export default function DashboardPage() {
                 {kpis?.deals_pending || 0}
               </p>
             </div>
-            <div className="text-3xl">📋</div>
+            <div className="text-3xl"></div>
           </div>
           <p className="text-xs text-orange-600 mt-2">Awaiting your approval</p>
         </Link>
 
         <Link
-          href="/dashboard/nexus"
+          href="/nexus"
           className="bg-purple-50 border-2 border-purple-200 rounded-lg p-4 hover:border-purple-400 transition"
         >
           <div className="flex items-center justify-between">
@@ -142,13 +142,13 @@ export default function DashboardPage() {
               <p className="text-sm font-medium text-purple-800">Nexus Feed</p>
               <p className="text-2xl font-bold text-purple-900">Live</p>
             </div>
-            <div className="text-3xl">🔄</div>
+            <div className="text-3xl"></div>
           </div>
           <p className="text-xs text-purple-600 mt-2">Agent negotiations</p>
         </Link>
 
         <Link
-          href="/dashboard/passports"
+          href="/passports"
           className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4 hover:border-blue-400 transition"
         >
           <div className="flex items-center justify-between">
@@ -160,13 +160,13 @@ export default function DashboardPage() {
                 {kpis?.deals_active || 0}
               </p>
             </div>
-            <div className="text-3xl">📜</div>
+            <div className="text-3xl"></div>
           </div>
           <p className="text-xs text-blue-600 mt-2">Active materials</p>
         </Link>
 
         <Link
-          href="/dashboard/agent/settings"
+          href="/agent/settings"
           className="bg-gray-50 border-2 border-gray-200 rounded-lg p-4 hover:border-gray-400 transition"
         >
           <div className="flex items-center justify-between">
@@ -176,7 +176,7 @@ export default function DashboardPage() {
               </p>
               <p className="text-2xl font-bold text-gray-900">Configure</p>
             </div>
-            <div className="text-3xl">⚙️</div>
+            <div className="text-3xl"></div>
           </div>
           <p className="text-xs text-gray-600 mt-2">Tune your agent</p>
         </Link>
@@ -186,7 +186,7 @@ export default function DashboardPage() {
       <div className="bg-white rounded-lg shadow">
         <div className="p-6 border-b border-gray-200">
           <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-            <span>🌍</span> Environmental Impact
+            <span></span> Environmental Impact
           </h2>
         </div>
         <div className="p-6 grid grid-cols-4 gap-6">
@@ -242,10 +242,10 @@ export default function DashboardPage() {
               <p className="text-3xl font-bold text-red-600">
                 {(kpis?.total_carbon_emissions || 0).toFixed(1)}
               </p>
-              <span className="text-sm text-gray-500">tons CO₂</span>
+              <span className="text-sm text-gray-500">tons CO</span>
             </div>
             <p className="text-xs text-green-600 mt-2">
-              ↓ {(kpis?.carbon_emissions_avoided || 0).toFixed(1)} tons avoided
+               {(kpis?.carbon_emissions_avoided || 0).toFixed(1)} tons avoided
             </p>
             <p className="text-xs text-gray-500">through circularity</p>
           </div>
@@ -273,7 +273,7 @@ export default function DashboardPage() {
       <div className="bg-white rounded-lg shadow">
         <div className="p-6 border-b border-gray-200">
           <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-            <span>💰</span> Financial Performance
+            <span></span> Financial Performance
           </h2>
         </div>
         <div className="p-6 grid grid-cols-4 gap-6">
@@ -284,7 +284,7 @@ export default function DashboardPage() {
             </p>
             <div className="mt-2 flex items-baseline gap-1">
               <p className="text-3xl font-bold text-green-600">
-                €{(kpis?.net_circular_value || 0).toLocaleString()}
+                {(kpis?.net_circular_value || 0).toLocaleString()}
               </p>
             </div>
             <p className="text-xs text-gray-500 mt-1">Revenue minus costs</p>
@@ -297,11 +297,11 @@ export default function DashboardPage() {
             </p>
             <div className="mt-2 flex items-baseline gap-1">
               <p className="text-3xl font-bold text-blue-600">
-                €{(kpis?.cost_savings || 0).toLocaleString()}
+                {(kpis?.cost_savings || 0).toLocaleString()}
               </p>
             </div>
             <p className="text-xs text-gray-500 mt-1">
-              vs. current disposal: €
+              vs. current disposal: 
               {(kpis?.disposal_cost || 0).toLocaleString()}/mo
             </p>
           </div>
@@ -313,7 +313,7 @@ export default function DashboardPage() {
             </p>
             <div className="mt-2 flex items-baseline gap-1">
               <p className="text-3xl font-bold text-purple-600">
-                €{(kpis?.circular_revenue || 0).toLocaleString()}
+                {(kpis?.circular_revenue || 0).toLocaleString()}
               </p>
             </div>
             <p className="text-xs text-gray-500 mt-1">
@@ -326,7 +326,7 @@ export default function DashboardPage() {
             <p className="text-sm font-medium text-gray-600">Avg. Deal Value</p>
             <div className="mt-2 flex items-baseline gap-1">
               <p className="text-3xl font-bold text-orange-600">
-                €{(kpis?.average_deal_value || 0).toLocaleString()}
+                {(kpis?.average_deal_value || 0).toLocaleString()}
               </p>
             </div>
             <p className="text-xs text-gray-500 mt-1">per transaction</p>
@@ -338,7 +338,7 @@ export default function DashboardPage() {
       <div className="bg-white rounded-lg shadow">
         <div className="p-6 border-b border-gray-200">
           <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-            <span>🤖</span> Your Agent Performance
+            <span></span> Your Agent Performance
           </h2>
         </div>
         <div className="p-6 grid grid-cols-3 gap-6">
@@ -357,7 +357,7 @@ export default function DashboardPage() {
               Total Value Generated
             </p>
             <p className="text-3xl font-bold text-green-600 mt-2">
-              €{(kpis?.agent_value_generated || 0).toLocaleString()}
+              {(kpis?.agent_value_generated || 0).toLocaleString()}
             </p>
             <p className="text-xs text-gray-500 mt-1">
               through agent negotiations
@@ -404,3 +404,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+

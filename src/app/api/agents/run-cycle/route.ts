@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import { AgentRunner } from "@/lib/agents/agent-runner";
 
 export async function POST() {
   try {
-    console.log("🚀 API: Starting agent cycle...");
+    console.log(" API: Starting agent cycle...");
 
     const result = await AgentRunner.runAllAgents();
 
@@ -13,7 +13,7 @@ export async function POST() {
       timestamp: new Date().toISOString(),
     });
   } catch (error: any) {
-    console.error("❌ API: Agent cycle failed:", error);
+    console.error(" API: Agent cycle failed:", error);
 
     return NextResponse.json(
       {
@@ -33,3 +33,4 @@ export async function POST() {
     );
   }
 }
+

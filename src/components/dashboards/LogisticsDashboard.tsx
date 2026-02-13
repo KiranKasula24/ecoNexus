@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -71,7 +71,7 @@ export default function LogisticsDashboard() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
-            🚚 Logistics Dashboard
+             Logistics Dashboard
           </h1>
           <p className="mt-2 text-gray-600">
             {company?.name} - Route Optimization & Coordination
@@ -102,25 +102,25 @@ export default function LogisticsDashboard() {
         <MetricCard
           title="Active Routes"
           value={stats.active_routes}
-          icon="🛣️"
+          icon=""
           color="blue"
         />
         <MetricCard
           title="Available Capacity"
           value={`${stats.available_capacity}t`}
-          icon="📦"
+          icon=""
           color="green"
         />
         <MetricCard
           title="Consolidation Opps"
           value={stats.consolidation_opportunities}
-          icon="🔗"
+          icon=""
           color="purple"
         />
         <MetricCard
           title="Pending Requests"
           value={stats.pending_requests}
-          icon="⏳"
+          icon=""
           color="yellow"
           highlight={stats.pending_requests > 0}
         />
@@ -195,23 +195,23 @@ export default function LogisticsDashboard() {
           <div className="flex items-start justify-between mb-4">
             <div>
               <h3 className="text-lg font-semibold text-gray-900">
-                💬 Nexus Feed
+                 Nexus Feed
               </h3>
               <p className="text-sm text-gray-700 mt-1">
                 Monitor transportation requests
               </p>
             </div>
-            <span className="text-3xl">🔍</span>
+            <span className="text-3xl"></span>
           </div>
           <div className="space-y-2">
             <Link
-              href="/dashboard/nexus?filter=transport"
+              href="/nexus?filter=transport"
               className="block w-full px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 text-center font-medium"
             >
               View Requests
             </Link>
             <Link
-              href="/dashboard/nexus?view=my-routes"
+              href="/nexus?view=my-routes"
               className="block w-full px-4 py-2 bg-white border border-orange-600 text-orange-700 rounded-lg hover:bg-orange-50 text-center font-medium"
             >
               My Route Offers
@@ -224,16 +224,16 @@ export default function LogisticsDashboard() {
           <div className="flex items-start justify-between mb-4">
             <div>
               <h3 className="text-lg font-semibold text-gray-900">
-                🎯 Optimization
+                 Optimization
               </h3>
               <p className="text-sm text-gray-700 mt-1">
                 {stats.consolidation_opportunities} consolidation opportunities
               </p>
             </div>
-            <span className="text-3xl">⚡</span>
+            <span className="text-3xl"></span>
           </div>
           <Link
-            href="/dashboard/routes/optimize"
+            href="/routes/optimize"
             className="block w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-center font-medium"
           >
             Optimize Routes
@@ -242,19 +242,19 @@ export default function LogisticsDashboard() {
 
         {/* Active Routes */}
         <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold mb-2">🛣️ Active Routes</h3>
+          <h3 className="text-lg font-semibold mb-2"> Active Routes</h3>
           <p className="text-sm text-gray-600 mb-4">
             {stats.active_routes} routes scheduled
           </p>
           <div className="space-y-2">
             <Link
-              href="/dashboard/routes/active"
+              href="/routes/active"
               className="block w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-center font-medium"
             >
               View Routes
             </Link>
             <Link
-              href="/dashboard/routes/plan"
+              href="/routes/plan"
               className="block w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-center font-medium"
             >
               Plan New Route
@@ -264,12 +264,12 @@ export default function LogisticsDashboard() {
 
         {/* Performance */}
         <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold mb-2">📊 Performance</h3>
+          <h3 className="text-lg font-semibold mb-2"> Performance</h3>
           <p className="text-sm text-gray-600 mb-4">
             Track efficiency, costs, and carbon
           </p>
           <Link
-            href="/dashboard/analytics/logistics"
+            href="/analytics/logistics"
             className="block w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-center font-medium"
           >
             View Analytics
@@ -282,7 +282,7 @@ export default function LogisticsDashboard() {
         <div className="flex items-start">
           <div className="flex-1">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">
-              🚀 Your NexaPrime Agent
+               Your NexaPrime Agent
             </h2>
             <p className="text-sm text-gray-700 mb-3">
               NexaPrime intelligently matches transportation requests and
@@ -315,7 +315,7 @@ export default function LogisticsDashboard() {
               <div className="bg-white rounded p-3">
                 <p className="text-gray-600">Base Rate</p>
                 <p className="font-semibold">
-                  €{profile?.base_rate_per_ton_km || 0.15}/ton-km
+                  {profile?.base_rate_per_ton_km || 0.15}/ton-km
                 </p>
               </div>
               <div className="bg-white rounded p-3">
@@ -338,14 +338,14 @@ export default function LogisticsDashboard() {
               </div>
             </div>
             <Link
-              href="/dashboard/agent/settings"
+              href="/agent/settings"
               className="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 font-medium inline-block"
             >
-              ⚙️ Configure NexaPrime
+               Configure NexaPrime
             </Link>
           </div>
           <div className="ml-6 text-right">
-            <div className="text-5xl mb-2">⚡</div>
+            <div className="text-5xl mb-2"></div>
             <div className="text-sm text-gray-600">NexaPrime</div>
             <div className="text-xs text-gray-500">Logistics</div>
           </div>
@@ -380,3 +380,5 @@ function MetricCard({ title, value, icon, color, highlight = false }: any) {
     </div>
   );
 }
+
+

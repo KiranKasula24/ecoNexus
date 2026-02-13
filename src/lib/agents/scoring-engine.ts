@@ -1,4 +1,4 @@
-/**
+﻿/**
  * SCORING ENGINE
  * Advanced scoring logic for deals and negotiations
  */
@@ -192,11 +192,11 @@ export class ScoringEngine {
     const gap = params.target_price - params.original_price;
 
     // Progressive closing: move more toward target each round
-    const percentToClose = 0.33 + (params.round / params.max_rounds) * 0.34; // 33% → 67%
+    const percentToClose = 0.33 + (params.round / params.max_rounds) * 0.34; // 33%  67%
 
     const counterOffer = params.original_price + gap * percentToClose;
 
-    // Add small randomness (±3%) for human-like behavior
+    // Add small randomness (3%) for human-like behavior
     const randomFactor = 0.97 + Math.random() * 0.06;
 
     return Math.round(counterOffer * randomFactor * 100) / 100;
@@ -223,3 +223,4 @@ export class ScoringEngine {
     return false;
   }
 }
+

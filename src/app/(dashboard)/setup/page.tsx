@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -65,6 +65,8 @@ export default function SetupPage() {
         return <ManufacturerSetup />;
       case "recycler":
         return <RecyclerSetup />;
+      case "processor":
+        return <ProcessorSetup />;
       case "energy_recovery":
         return <ProcessorSetup />;
       case "logistics":
@@ -152,7 +154,7 @@ function ManufacturerSetup() {
         .update({ status: "active" })
         .eq("company_id", company.id);
 
-      router.push("/dashboard/materials/requirements");
+      router.push("/materials/requirements");
     } catch (error) {
       console.error("Setup error:", error);
       alert("Failed to complete setup.");
@@ -352,7 +354,7 @@ function ManufacturerSetup() {
         {/* Step 2: Nexa Configuration */}
         {step === 2 && (
           <div className="space-y-6">
-            <h2 className="text-xl font-semibold">Deploy Your Nexa Agent 🤖</h2>
+            <h2 className="text-xl font-semibold">Deploy Your Nexa Agent </h2>
 
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
               <h3 className="font-semibold text-blue-900 mb-2">
@@ -402,7 +404,7 @@ function ManufacturerSetup() {
 
             <div className="bg-green-50 border border-green-200 rounded-lg p-6">
               <h3 className="font-semibold text-green-900 mb-2">
-                ✅ Next Steps
+                 Next Steps
               </h3>
               <ol className="text-sm text-green-800 space-y-2 list-decimal list-inside">
                 <li>Input your material requirements (what you need to buy)</li>
@@ -519,7 +521,7 @@ function RecyclerSetup() {
         throw agentResponse.error;
       }
 
-      router.push("/dashboard");
+      router.push("/");
     } catch (error) {
       console.error("Setup error:", error);
       alert("Failed to complete setup. Please try again.");
@@ -549,7 +551,7 @@ function RecyclerSetup() {
       <div className="bg-white shadow rounded-lg p-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">
-            Welcome, Recycler! ♻️
+            Welcome, Recycler! 
           </h1>
           <p className="mt-2 text-gray-600">
             Set up your recycling operations and deploy your NexaPrime agent
@@ -796,7 +798,7 @@ function RecyclerSetup() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-3">
-                Buy Prices (€/ton) - What you&apos;ll pay for waste
+                Buy Prices (/ton) - What you&apos;ll pay for waste
               </label>
               {formData.accepted_materials.map((material) => (
                 <div
@@ -820,14 +822,14 @@ function RecyclerSetup() {
                     }
                     className="flex-1 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
                   />
-                  <span className="text-sm text-gray-600">€/ton</span>
+                  <span className="text-sm text-gray-600">/ton</span>
                 </div>
               ))}
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-3">
-                Processing Fees (€/ton) - If providing processing service
+                Processing Fees (/ton) - If providing processing service
               </label>
               {formData.accepted_materials.map((material) => (
                 <div
@@ -851,14 +853,14 @@ function RecyclerSetup() {
                     }
                     className="flex-1 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
                   />
-                  <span className="text-sm text-gray-600">€/ton</span>
+                  <span className="text-sm text-gray-600">/ton</span>
                 </div>
               ))}
             </div>
 
             <div className="bg-green-50 border border-green-200 rounded-lg p-6">
               <h3 className="font-semibold text-green-900 mb-2">
-                🚀 Your NexaPrime Agent is Ready!
+                 Your NexaPrime Agent is Ready!
               </h3>
               <p className="text-sm text-green-800 mb-3">
                 Once activated, your agent will:
@@ -989,7 +991,7 @@ function ProcessorSetup() {
         throw agentResponse.error;
       }
 
-      router.push("/dashboard");
+      router.push("/");
     } catch (error) {
       console.error("Setup error:", error);
       alert("Failed to complete setup. Please try again.");
@@ -1003,7 +1005,7 @@ function ProcessorSetup() {
       <div className="bg-white shadow rounded-lg p-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">
-            Welcome, Processor! ⚙️
+            Welcome, Processor! 
           </h1>
           <p className="mt-2 text-gray-600">
             Set up your processing services and deploy your NexaPrime agent
@@ -1306,7 +1308,7 @@ function ProcessorSetup() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-3">
-                Processing Fees (€/ton)
+                Processing Fees (/ton)
               </label>
               {formData.input_materials.map((material) => (
                 <div
@@ -1330,14 +1332,14 @@ function ProcessorSetup() {
                     }
                     className="flex-1 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
                   />
-                  <span className="text-sm text-gray-600">€/ton</span>
+                  <span className="text-sm text-gray-600">/ton</span>
                 </div>
               ))}
             </div>
 
             <div className="bg-purple-50 border border-purple-200 rounded-lg p-6">
               <h3 className="font-semibold text-purple-900 mb-2">
-                🚀 Your NexaPrime Agent is Ready!
+                 Your NexaPrime Agent is Ready!
               </h3>
               <p className="text-sm text-purple-800 mb-3">
                 Your agent will help you:
@@ -1345,7 +1347,7 @@ function ProcessorSetup() {
               <ul className="text-sm text-purple-800 space-y-1 list-disc list-inside">
                 <li>Find by-products that need processing</li>
                 <li>Match with buyers for your outputs</li>
-                <li>Coordinate three-way deals (supplier → you → buyer)</li>
+                <li>Coordinate three-way deals (supplier  you  buyer)</li>
                 <li>Optimize capacity utilization</li>
               </ul>
             </div>
@@ -1472,7 +1474,7 @@ function LogisticsSetup() {
         throw agentResponse.error;
       }
 
-      router.push("/dashboard");
+      router.push("/");
     } catch (error) {
       console.error("Setup error:", error);
       alert("Failed to complete setup. Please try again.");
@@ -1486,7 +1488,7 @@ function LogisticsSetup() {
       <div className="bg-white shadow rounded-lg p-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">
-            Welcome, Logistics Provider! 🚚
+            Welcome, Logistics Provider! 
           </h1>
           <p className="mt-2 text-gray-600">
             Set up your fleet operations and deploy your NexaPrime agent
@@ -1768,7 +1770,7 @@ function LogisticsSetup() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Base Rate (€/ton-km)
+                  Base Rate (/ton-km)
                 </label>
                 <input
                   type="number"
@@ -1837,7 +1839,7 @@ function LogisticsSetup() {
 
             <div className="bg-orange-50 border border-orange-200 rounded-lg p-6">
               <h3 className="font-semibold text-orange-900 mb-2">
-                🚀 Your NexaPrime Agent is Ready!
+                 Your NexaPrime Agent is Ready!
               </h3>
               <p className="text-sm text-orange-800 mb-3">
                 Your logistics agent will intelligently:
@@ -1877,3 +1879,5 @@ function LogisticsSetup() {
     </div>
   );
 }
+
+

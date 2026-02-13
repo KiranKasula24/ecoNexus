@@ -1,8 +1,9 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/database/supabase";
+import { useRouter } from "next/navigation";
 import { getMaterialProperties } from "@/lib/constants/material-database";
 import { calculateCircularSavings } from "@/lib/calculations/economic-kpis";
 import { calculateCarbonSavings } from "@/lib/calculations/environmental-kpis";
@@ -36,6 +37,7 @@ interface CircularOpportunity {
 }
 
 export default function OpportunitiesPage() {
+  const router = useRouter();
   const { company } = useAuth();
   const [opportunities, setOpportunities] = useState<CircularOpportunity[]>([]);
   const [loading, setLoading] = useState(true);
@@ -60,7 +62,7 @@ export default function OpportunitiesPage() {
         .from("materials")
         .select("*")
         .eq("company_id", company.id)
-        .eq("source_type", "requirement");
+        .eq("category", "input");
 
       if (!materials || materials.length === 0) {
         setOpportunities([]);
@@ -232,6 +234,35 @@ export default function OpportunitiesPage() {
     }
   };
 
+  const startNegotiation = async (opportunity: CircularOpportunity) => {
+    const offerPostId = opportunity.circular_source?.post_id;
+    if (!offerPostId) {
+      alert("This opportunity does not have a live offer to negotiate.");
+      return;
+    }
+
+    try {
+      const session = await supabase.auth.getSession();
+      const token = session.data.session?.access_token;
+      const res = await fetch("/api/agents/deals/propose", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ offer_post_id: offerPostId }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to start negotiation");
+
+      alert(data.message || "Deal created and sent for approval.");
+      router.push("/deals/created");
+    } catch (error: any) {
+      alert(error?.message || "Failed to start negotiation");
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -246,7 +277,7 @@ export default function OpportunitiesPage() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
-            🔄 Circular Opportunities
+             Circular Opportunities
           </h1>
           <p className="mt-2 text-gray-600">
             Discover cost savings and carbon reductions through circular
@@ -257,7 +288,7 @@ export default function OpportunitiesPage() {
           onClick={() => setShowWhatIf(true)}
           className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium"
         >
-          🔮 What-If Simulator
+           What-If Simulator
         </button>
       </div>
 
@@ -268,7 +299,7 @@ export default function OpportunitiesPage() {
             Total Potential Savings
           </h3>
           <div className="text-3xl font-bold text-green-900">
-            €
+            
             {opportunities
               .reduce((sum, opp) => sum + opp.savings.cost_savings, 0)
               .toLocaleString()}
@@ -286,7 +317,7 @@ export default function OpportunitiesPage() {
               .toFixed(1)}{" "}
             t
           </div>
-          <p className="text-xs text-gray-600 mt-1">CO₂ per month</p>
+          <p className="text-xs text-gray-600 mt-1">CO per month</p>
         </div>
 
         <div className="bg-purple-50 border border-purple-200 rounded-lg p-5">
@@ -325,6 +356,7 @@ export default function OpportunitiesPage() {
               key={opp.id}
               opportunity={opp}
               onViewDetails={() => setSelectedOpp(opp)}
+              onStartNegotiation={() => startNegotiation(opp)}
             />
           ))}
         </div>
@@ -353,9 +385,11 @@ export default function OpportunitiesPage() {
 function OpportunityCard({
   opportunity,
   onViewDetails,
+  onStartNegotiation,
 }: {
   opportunity: CircularOpportunity;
   onViewDetails: () => void;
+  onStartNegotiation: () => void;
 }) {
   const isLiveOffer = opportunity.circular_source?.type === "nexus_offer";
 
@@ -379,11 +413,11 @@ function OpportunityCard({
             </h3>
             {isLiveOffer ? (
               <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">
-                🟢 Live Offer
+                 Live Offer
               </span>
             ) : (
               <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">
-                💡 Market Potential
+                 Market Potential
               </span>
             )}
             <span
@@ -399,7 +433,7 @@ function OpportunityCard({
             <div>
               <p className="text-xs text-gray-500 mb-1">Current Cost</p>
               <p className="text-lg font-semibold text-gray-900">
-                €
+                
                 {(
                   opportunity.current_cost / opportunity.current_volume
                 ).toFixed(2)}
@@ -409,17 +443,17 @@ function OpportunityCard({
             <div>
               <p className="text-xs text-gray-500 mb-1">Circular Price</p>
               <p className="text-lg font-semibold text-green-600">
-                €{opportunity.circular_source?.price.toFixed(2)}/ton
+                {opportunity.circular_source?.price.toFixed(2)}/ton
               </p>
             </div>
             <div>
               <p className="text-xs text-gray-500 mb-1">Monthly Savings</p>
               <p className="text-lg font-semibold text-green-600">
-                €{opportunity.savings.cost_savings.toLocaleString()}
+                {opportunity.savings.cost_savings.toLocaleString()}
               </p>
             </div>
             <div>
-              <p className="text-xs text-gray-500 mb-1">CO₂ Reduction</p>
+              <p className="text-xs text-gray-500 mb-1">CO Reduction</p>
               <p className="text-lg font-semibold text-blue-600">
                 {opportunity.savings.carbon_savings.toFixed(1)} tons
               </p>
@@ -430,9 +464,9 @@ function OpportunityCard({
             <div className="bg-gray-50 rounded-lg p-3 mb-4">
               <p className="text-sm text-gray-700">
                 <strong>Supplier:</strong>{" "}
-                {opportunity.circular_source.supplier} •
+                {opportunity.circular_source.supplier} 
                 <strong className="ml-2">Available:</strong>{" "}
-                {opportunity.circular_source.volume} tons •
+                {opportunity.circular_source.volume} tons 
                 <strong className="ml-2">Quality:</strong> Tier{" "}
                 {opportunity.circular_source.quality_tier}
               </p>
@@ -447,7 +481,10 @@ function OpportunityCard({
               View Details
             </button>
             {isLiveOffer && (
-              <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium text-sm">
+              <button
+                onClick={onStartNegotiation}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium text-sm"
+              >
                 Start Negotiation
               </button>
             )}
@@ -517,16 +554,16 @@ function OpportunityDetailsModal({
                 <tr className="border-b border-gray-200">
                   <td className="py-3">Price per ton</td>
                   <td className="text-right">
-                    €
+                    
                     {(
                       opportunity.current_cost / opportunity.current_volume
                     ).toFixed(2)}
                   </td>
                   <td className="text-right text-green-600">
-                    €{opportunity.circular_source?.price.toFixed(2)}
+                    {opportunity.circular_source?.price.toFixed(2)}
                   </td>
                   <td className="text-right font-semibold text-green-600">
-                    -€
+                    -
                     {(
                       opportunity.current_cost / opportunity.current_volume -
                       (opportunity.circular_source?.price || 0)
@@ -536,21 +573,21 @@ function OpportunityDetailsModal({
                 <tr className="border-b border-gray-200">
                   <td className="py-3">Monthly cost</td>
                   <td className="text-right">
-                    €{opportunity.current_cost.toLocaleString()}
+                    {opportunity.current_cost.toLocaleString()}
                   </td>
                   <td className="text-right text-green-600">
-                    €
+                    
                     {(
                       (opportunity.circular_source?.price || 0) *
                       opportunity.current_volume
                     ).toLocaleString()}
                   </td>
                   <td className="text-right font-semibold text-green-600">
-                    -€{opportunity.savings.cost_savings.toLocaleString()}
+                    -{opportunity.savings.cost_savings.toLocaleString()}
                   </td>
                 </tr>
                 <tr className="border-b border-gray-200">
-                  <td className="py-3">CO₂ emissions (tons)</td>
+                  <td className="py-3">CO emissions (tons)</td>
                   <td className="text-right">
                     {(opportunity.current_volume * 2.5).toFixed(1)}
                   </td>
@@ -584,7 +621,7 @@ function OpportunityDetailsModal({
                 Annual Cost Savings
               </h4>
               <div className="text-3xl font-bold text-green-900">
-                €{(opportunity.savings.cost_savings * 12).toLocaleString()}
+                {(opportunity.savings.cost_savings * 12).toLocaleString()}
               </div>
             </div>
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -690,7 +727,7 @@ function WhatIfSimulator({
           <div className="flex justify-between items-start mb-6">
             <div>
               <h2 className="text-2xl font-bold text-gray-900">
-                🔮 What-If Simulator
+                 What-If Simulator
               </h2>
               <p className="text-gray-600 text-sm mt-1">
                 Model different scenarios for circular material adoption
@@ -814,7 +851,7 @@ function WhatIfSimulator({
               <div>
                 <p className="text-sm text-gray-600 mb-1">Cost Savings</p>
                 <div className="text-3xl font-bold text-green-900">
-                  €{(projectedImpact.cost_savings * 12).toLocaleString()}
+                  {(projectedImpact.cost_savings * 12).toLocaleString()}
                 </div>
                 <p className="text-xs text-gray-600 mt-1">per year</p>
               </div>
@@ -824,7 +861,7 @@ function WhatIfSimulator({
                 <div className="text-3xl font-bold text-blue-900">
                   {(projectedImpact.carbon_savings * 12).toFixed(0)} t
                 </div>
-                <p className="text-xs text-gray-600 mt-1">CO₂ per year</p>
+                <p className="text-xs text-gray-600 mt-1">CO per year</p>
               </div>
 
               <div>
@@ -903,3 +940,4 @@ function ScenarioBar({
     </div>
   );
 }
+

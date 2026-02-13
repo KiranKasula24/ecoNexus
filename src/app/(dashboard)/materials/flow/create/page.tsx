@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -195,7 +195,7 @@ export default function MaterialFlowFormPage() {
       const res = await fetch("/api/materials/flow/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include", // 🔥 ADD THIS
+        credentials: "include", //  ADD THIS
         body: JSON.stringify({
           company_id: company.id,
           primaryMaterials,
@@ -208,7 +208,7 @@ export default function MaterialFlowFormPage() {
         throw new Error(data.error || "Failed to create material flow");
       }
 
-      router.push(`/passports/${data.passport.id}`);
+      router.push(data.next_redirect || `/passports/${data.passport.id}`);
     } catch (err: unknown) {
       const message =
         err instanceof Error
@@ -630,3 +630,5 @@ export default function MaterialFlowFormPage() {
     </div>
   );
 }
+
+

@@ -1,7 +1,8 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/lib/database/supabase";
 import {
   getMaterialProperties,
   searchMaterials,
@@ -111,9 +112,42 @@ export default function MaterialRequirementsPage() {
 
   // Save all requirements
   const saveRequirements = async () => {
-    // TODO: Save to database via API
-    console.log("Saving requirements:", requirements);
-    alert(`Saved ${requirements.length} material requirements!`);
+    if (!company?.id) {
+      alert("Company context missing. Please log in again.");
+      return;
+    }
+    if (requirements.length === 0) {
+      alert("No requirements to save.");
+      return;
+    }
+
+    const rows = requirements.map((req) => {
+      const material = getMaterialProperties(req.material_type);
+      return {
+        company_id: company.id,
+        category: "input",
+        material_type: req.material_type,
+        material_category: material?.category || req.material_type,
+        material_subtype: material?.subtype || req.material_type,
+        monthly_volume: req.volume,
+        unit: req.unit,
+        cost_per_unit: req.current_cost_per_unit,
+        technical_properties: {
+          source_type: "requirement",
+          frequency: req.frequency,
+          current_supplier: req.current_supplier || null,
+          purpose: req.purpose || null,
+        },
+      };
+    });
+
+    const { error } = await supabase.from("materials").insert(rows as any);
+    if (error) {
+      alert(`Failed to save requirements: ${error.message}`);
+      return;
+    }
+
+    alert(`Saved ${requirements.length} material requirements.`);
   };
 
   // Get all categories for filter
@@ -163,7 +197,7 @@ export default function MaterialRequirementsPage() {
                       {material.subtype} ({material.category})
                     </div>
                     <div className="text-sm text-gray-600">
-                      Avg. price: €{material.market_price.average}/ton |
+                      Avg. price: {material.market_price.average}/ton |
                       Recyclability: {material.recyclability_score}%
                     </div>
                   </button>
@@ -204,7 +238,7 @@ export default function MaterialRequirementsPage() {
             >
               <option value="tons">Tons</option>
               <option value="kg">Kilograms</option>
-              <option value="m³">Cubic Meters</option>
+              <option value="m">Cubic Meters</option>
               <option value="liters">Liters</option>
             </select>
           </div>
@@ -212,7 +246,7 @@ export default function MaterialRequirementsPage() {
           {/* Current Cost Per Unit */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Current Cost (€/unit) *
+              Current Cost (/unit) *
             </label>
             <input
               type="number"
@@ -230,7 +264,7 @@ export default function MaterialRequirementsPage() {
             />
             {selectedMaterial && (
               <p className="text-xs text-gray-500 mt-1">
-                Market average: €{selectedMaterial.market_price.average}/
+                Market average: {selectedMaterial.market_price.average}/
                 {formData.unit}
               </p>
             )}
@@ -304,17 +338,17 @@ export default function MaterialRequirementsPage() {
                 {selectedMaterial.recyclability_score}%
               </div>
               <div>
-                <span className="font-medium">Market Price:</span> €
+                <span className="font-medium">Market Price:</span> 
                 {selectedMaterial.market_price.min}-
                 {selectedMaterial.market_price.max}/ton
               </div>
               <div>
                 <span className="font-medium">Carbon (Virgin):</span>{" "}
-                {selectedMaterial.carbon_footprint.virgin_production} kg CO₂/ton
+                {selectedMaterial.carbon_footprint.virgin_production} kg CO/ton
               </div>
               <div>
                 <span className="font-medium">Carbon (Recycled):</span>{" "}
-                {selectedMaterial.carbon_footprint.recycling} kg CO₂/ton
+                {selectedMaterial.carbon_footprint.recycling} kg CO/ton
               </div>
               <div>
                 <span className="font-medium">Quality Tiers:</span>{" "}
@@ -393,10 +427,10 @@ export default function MaterialRequirementsPage() {
                         {req.volume} {req.unit}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        €{req.current_cost_per_unit}
+                        {req.current_cost_per_unit}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        €{total.toFixed(2)}
+                        {total.toFixed(2)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
@@ -425,7 +459,7 @@ export default function MaterialRequirementsPage() {
                 Total Monthly Cost (estimated):
               </span>
               <span className="text-lg font-bold text-gray-900">
-                €
+                
                 {requirements
                   .reduce((sum, req) => {
                     const cost = req.volume * req.current_cost_per_unit;
@@ -442,3 +476,4 @@ export default function MaterialRequirementsPage() {
     </div>
   );
 }
+

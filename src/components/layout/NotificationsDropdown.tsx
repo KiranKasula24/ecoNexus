@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -117,19 +117,19 @@ export default function NotificationsDropdown() {
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case "deal_proposed":
-        return "🤝";
+        return "";
       case "deal_awaiting_approval":
-        return "⏳";
+        return "";
       case "deal_completed":
-        return "✅";
+        return "";
       case "deal_rejected":
-        return "❌";
+        return "";
       case "negotiation_started":
-        return "💬";
+        return "";
       case "agent_action":
-        return "🤖";
+        return "";
       default:
-        return "📢";
+        return "";
     }
   };
 
@@ -221,7 +221,7 @@ export default function NotificationsDropdown() {
                     }`}
                   >
                     <Link
-                      href={notification.action_url || "/dashboard"}
+                      href={notification.action_url || "/"}
                       onClick={() => {
                         markAsRead(notification.id);
                         setIsOpen(false);
@@ -264,7 +264,7 @@ export default function NotificationsDropdown() {
             {notifications.length > 0 && (
               <div className="p-3 border-t border-gray-200 text-center">
                 <Link
-                  href="/dashboard/notifications"
+                  href="/notifications"
                   className="text-sm text-blue-600 hover:text-blue-800 font-medium"
                   onClick={() => setIsOpen(false)}
                 >
@@ -278,3 +278,5 @@ export default function NotificationsDropdown() {
     </div>
   );
 }
+
+

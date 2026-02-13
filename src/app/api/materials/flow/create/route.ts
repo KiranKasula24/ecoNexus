@@ -1,8 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
 import { createPassportFromWasteStream } from "@/lib/material-intelligence/passport-service";
 import { generateMaterialFlowOpportunities } from "@/lib/material-intelligence/opportunity-engine";
+import { AgentRunner } from "@/lib/agents/agent-runner";
+import { ensureSuperAgentForLocality } from "@/lib/agents/super-agent-registry";
 
 type WasteClassification =
   | "reusable"
@@ -267,6 +269,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const { data: companyData } = await supabase
+      .from("companies")
+      .select("locality, location")
+      .eq("id", body.company_id)
+      .maybeSingle();
+
+    if (companyData?.locality) {
+      await ensureSuperAgentForLocality({
+        locality: companyData.locality,
+        city: (companyData.location as any)?.city,
+        country: (companyData.location as any)?.country,
+      });
+    }
+
+    let agentRunResult: { success: boolean; stats?: unknown; error?: string } | null = null;
+    try {
+      const run = await AgentRunner.runAllAgents();
+      agentRunResult = { success: run.success, stats: run.stats };
+    } catch (agentErr: any) {
+      agentRunResult = {
+        success: false,
+        error: agentErr?.message || "Agent run failed after MFA",
+      };
+    }
+
     return NextResponse.json({
       success: true,
       primary_materials: insertedPrimaryMaterials || [],
@@ -274,6 +301,8 @@ export async function POST(request: NextRequest) {
       waste_stream: wasteStream,
       passport: updatedPassport,
       circular_opportunities: circularOpportunities,
+      next_redirect: `/opportunities?passport_id=${passport.id}&auto=1`,
+      agent_run: agentRunResult,
     });
   } catch (error: unknown) {
     console.error("Material flow create error:", error);
@@ -287,3 +316,4 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+

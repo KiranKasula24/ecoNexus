@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createClient } from "@supabase/supabase-js";
 
@@ -14,8 +14,16 @@ export async function POST(request: NextRequest) {
     // 1. AUTH VALIDATION
     // ============================
 
-    const cookieStore = cookies();
-    const accessToken = (await cookieStore).get("sb-access-token")?.value;
+    const authHeader = request.headers.get("authorization");
+    let accessToken: string | undefined;
+    if (authHeader?.toLowerCase().startsWith("bearer ")) {
+      accessToken = authHeader.slice(7).trim();
+    }
+
+    if (!accessToken) {
+      const cookieStore = cookies();
+      accessToken = (await cookieStore).get("sb-access-token")?.value;
+    }
 
     if (!accessToken) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -131,7 +139,7 @@ export async function POST(request: NextRequest) {
           title: "Deal Rejected",
           message: `Deal for ${deal.volume} tons ${deal.material_category} was rejected`,
           related_deal_id: deal_id,
-          action_url: `/dashboard/deals`,
+          action_url: `/deals`,
         });
       }
 
@@ -162,7 +170,7 @@ export async function POST(request: NextRequest) {
           title: "Deal Awaiting Your Approval",
           message: `${deal.seller_company?.name} approved the deal. Your approval needed.`,
           related_deal_id: deal_id,
-          action_url: `/dashboard/deals/pending`,
+          action_url: `/deals/created`,
         });
       }
 
@@ -207,7 +215,7 @@ export async function POST(request: NextRequest) {
           title: "Deal Completed!",
           message: `Deal with ${deal.buyer_company?.name} is now active.`,
           related_deal_id: deal_id,
-          action_url: `/dashboard/deals/${deal_id}`,
+          action_url: `/deals/${deal_id}`,
         });
       } else {
         return NextResponse.json(
@@ -247,3 +255,4 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+

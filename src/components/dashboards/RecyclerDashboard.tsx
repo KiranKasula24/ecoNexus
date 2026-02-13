@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -77,7 +77,7 @@ export default function RecyclerDashboard() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
-            ♻️ Recycler Dashboard
+             Recycler Dashboard
           </h1>
           <p className="mt-2 text-gray-600">
             {company?.name} - Waste Processing Operations
@@ -106,26 +106,26 @@ export default function RecyclerDashboard() {
         <MetricCard
           title="Active Buy Requests"
           value={stats.active_buy_requests}
-          icon="🛒"
+          icon=""
           color="blue"
         />
         <MetricCard
           title="Materials for Sale"
           value={stats.active_offers}
-          icon="📦"
+          icon=""
           color="green"
         />
         <MetricCard
           title="Pending Purchases"
           value={stats.pending_purchases}
-          icon="⏳"
+          icon=""
           color="yellow"
           highlight={stats.pending_purchases > 0}
         />
         <MetricCard
           title="Capacity Utilization"
           value={`${stats.processing_utilization}%`}
-          icon="⚙️"
+          icon=""
           color="purple"
         />
       </div>
@@ -195,23 +195,23 @@ export default function RecyclerDashboard() {
           <div className="flex items-start justify-between mb-4">
             <div>
               <h3 className="text-lg font-semibold text-gray-900">
-                💬 Nexus Feed
+                 Nexus Feed
               </h3>
               <p className="text-sm text-gray-700 mt-1">
                 Global marketplace - see all waste streams
               </p>
             </div>
-            <span className="text-3xl">🌍</span>
+            <span className="text-3xl"></span>
           </div>
           <div className="space-y-2">
             <Link
-              href="/dashboard/nexus"
+              href="/nexus"
               className="block w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-center font-medium"
             >
               Open Nexus
             </Link>
             <Link
-              href="/dashboard/nexus?view=buy-requests"
+              href="/nexus?view=buy-requests"
               className="block w-full px-4 py-2 bg-white border border-green-600 text-green-700 rounded-lg hover:bg-green-50 text-center font-medium"
             >
               My Buy Requests
@@ -224,17 +224,17 @@ export default function RecyclerDashboard() {
           <div className="flex items-start justify-between mb-4">
             <div>
               <h3 className="text-lg font-semibold text-gray-900">
-                ✅ Pending Approvals
+                 Pending Approvals
               </h3>
               <p className="text-sm text-gray-700 mt-1">
                 {stats.pending_purchases} purchase
                 {stats.pending_purchases !== 1 ? "s" : ""} awaiting your review
               </p>
             </div>
-            <span className="text-3xl">📋</span>
+            <span className="text-3xl"></span>
           </div>
           <Link
-            href="/dashboard/deals/pending"
+            href="/deals/pending"
             className="block w-full px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 text-center font-medium"
           >
             Review Deals
@@ -243,19 +243,19 @@ export default function RecyclerDashboard() {
 
         {/* Inventory Management */}
         <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold mb-2">📦 Inventory</h3>
+          <h3 className="text-lg font-semibold mb-2"> Inventory</h3>
           <p className="text-sm text-gray-600 mb-4">
             Manage processed materials available for sale
           </p>
           <div className="space-y-2">
             <Link
-              href="/dashboard/inventory"
+              href="/inventory"
               className="block w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-center font-medium"
             >
               View Inventory
             </Link>
             <Link
-              href="/dashboard/inventory/add"
+              href="/inventory/add"
               className="block w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-center font-medium"
             >
               Add to Inventory
@@ -265,12 +265,12 @@ export default function RecyclerDashboard() {
 
         {/* Processing KPIs */}
         <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold mb-2">📊 Performance</h3>
+          <h3 className="text-lg font-semibold mb-2"> Performance</h3>
           <p className="text-sm text-gray-600 mb-4">
             Track processing efficiency and throughput
           </p>
           <Link
-            href="/dashboard/analytics/recycler"
+            href="/analytics/recycler"
             className="block w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-center font-medium"
           >
             View KPIs
@@ -283,7 +283,7 @@ export default function RecyclerDashboard() {
         <div className="flex items-start">
           <div className="flex-1">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">
-              🚀 Your NexaPrime Agent
+               Your NexaPrime Agent
             </h2>
             <p className="text-sm text-gray-700 mb-3">
               NexaPrime scans ALL localities globally for waste streams matching
@@ -317,15 +317,15 @@ export default function RecyclerDashboard() {
             </div>
             <div className="mt-4">
               <Link
-                href="/dashboard/agent/settings"
+                href="/agent/settings"
                 className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium inline-block"
               >
-                ⚙️ Configure NexaPrime
+                 Configure NexaPrime
               </Link>
             </div>
           </div>
           <div className="ml-6 text-right">
-            <div className="text-5xl mb-2">⚡</div>
+            <div className="text-5xl mb-2"></div>
             <div className="text-sm text-gray-600">NexaPrime</div>
             <div className="text-xs text-gray-500">Recycler</div>
           </div>
@@ -359,3 +359,5 @@ function MetricCard({ title, value, icon, color, highlight = false }: any) {
     </div>
   );
 }
+
+

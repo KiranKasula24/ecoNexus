@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -85,7 +85,7 @@ export default function ProcessorDashboard() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
-            ⚙️ Processor Dashboard
+             Processor Dashboard
           </h1>
           <p className="mt-2 text-gray-600">
             {company?.name} - By-Product Processing Services
@@ -116,26 +116,26 @@ export default function ProcessorDashboard() {
         <MetricCard
           title="Service Offers"
           value={stats.active_service_offers}
-          icon="📢"
+          icon=""
           color="purple"
         />
         <MetricCard
           title="Pending Jobs"
           value={stats.pending_jobs}
-          icon="⏳"
+          icon=""
           color="yellow"
           highlight={stats.pending_jobs > 0}
         />
         <MetricCard
           title="Processing"
           value={stats.processing_jobs}
-          icon="⚡"
+          icon=""
           color="blue"
         />
         <MetricCard
           title="Available Capacity"
           value={`${stats.capacity_available}t`}
-          icon="📊"
+          icon=""
           color="green"
         />
       </div>
@@ -231,23 +231,23 @@ export default function ProcessorDashboard() {
           <div className="flex items-start justify-between mb-4">
             <div>
               <h3 className="text-lg font-semibold text-gray-900">
-                💬 Nexus Feed
+                 Nexus Feed
               </h3>
               <p className="text-sm text-gray-700 mt-1">
                 Find by-products that need processing
               </p>
             </div>
-            <span className="text-3xl">🔍</span>
+            <span className="text-3xl"></span>
           </div>
           <div className="space-y-2">
             <Link
-              href="/dashboard/nexus"
+              href="/nexus"
               className="block w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-center font-medium"
             >
               Browse Opportunities
             </Link>
             <Link
-              href="/dashboard/nexus?view=my-offers"
+              href="/nexus?view=my-offers"
               className="block w-full px-4 py-2 bg-white border border-purple-600 text-purple-700 rounded-lg hover:bg-purple-50 text-center font-medium"
             >
               My Service Offers
@@ -259,23 +259,23 @@ export default function ProcessorDashboard() {
         <div className="bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-200 rounded-lg p-6">
           <div className="flex items-start justify-between mb-4">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">📋 Jobs</h3>
+              <h3 className="text-lg font-semibold text-gray-900"> Jobs</h3>
               <p className="text-sm text-gray-700 mt-1">
-                {stats.pending_jobs} pending • {stats.processing_jobs} in
+                {stats.pending_jobs} pending  {stats.processing_jobs} in
                 progress
               </p>
             </div>
-            <span className="text-3xl">⚙️</span>
+            <span className="text-3xl"></span>
           </div>
           <div className="space-y-2">
             <Link
-              href="/dashboard/jobs/pending"
+              href="/jobs/pending"
               className="block w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-center font-medium"
             >
               Review Pending
             </Link>
             <Link
-              href="/dashboard/jobs/active"
+              href="/jobs/active"
               className="block w-full px-4 py-2 bg-white border border-blue-600 text-blue-700 rounded-lg hover:bg-blue-50 text-center font-medium"
             >
               Active Jobs
@@ -285,7 +285,7 @@ export default function ProcessorDashboard() {
 
         {/* Pricing Management */}
         <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold mb-2">💰 Pricing</h3>
+          <h3 className="text-lg font-semibold mb-2"> Pricing</h3>
           <p className="text-sm text-gray-600 mb-4">
             Revenue Model:{" "}
             <span className="font-semibold capitalize">
@@ -293,7 +293,7 @@ export default function ProcessorDashboard() {
             </span>
           </p>
           <Link
-            href="/dashboard/pricing"
+            href="/pricing"
             className="block w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-center font-medium"
           >
             Manage Pricing
@@ -302,12 +302,12 @@ export default function ProcessorDashboard() {
 
         {/* Analytics */}
         <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold mb-2">📊 Analytics</h3>
+          <h3 className="text-lg font-semibold mb-2"> Analytics</h3>
           <p className="text-sm text-gray-600 mb-4">
             Track throughput, efficiency, and revenue
           </p>
           <Link
-            href="/dashboard/analytics/processor"
+            href="/analytics/processor"
             className="block w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-center font-medium"
           >
             View Performance
@@ -320,7 +320,7 @@ export default function ProcessorDashboard() {
         <div className="flex items-start">
           <div className="flex-1">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">
-              🚀 Your NexaPrime Agent
+               Your NexaPrime Agent
             </h2>
             <p className="text-sm text-gray-700 mb-3">
               NexaPrime finds by-products needing transformation and coordinates
@@ -333,19 +333,19 @@ export default function ProcessorDashboard() {
               <ol className="text-sm text-gray-700 space-y-1 list-decimal list-inside">
                 <li>Scans Nexus for by-products matching your inputs</li>
                 <li>Finds buyers interested in your outputs</li>
-                <li>Coordinates supplier → you → buyer deals</li>
+                <li>Coordinates supplier  you  buyer deals</li>
                 <li>Proposes processing jobs for your approval</li>
               </ol>
             </div>
             <Link
-              href="/dashboard/agent/settings"
+              href="/agent/settings"
               className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium inline-block"
             >
-              ⚙️ Configure NexaPrime
+               Configure NexaPrime
             </Link>
           </div>
           <div className="ml-6 text-right">
-            <div className="text-5xl mb-2">⚡</div>
+            <div className="text-5xl mb-2"></div>
             <div className="text-sm text-gray-600">NexaPrime</div>
             <div className="text-xs text-gray-500">Processor</div>
           </div>
@@ -379,3 +379,5 @@ function MetricCard({ title, value, icon, color, highlight = false }: any) {
     </div>
   );
 }
+
+

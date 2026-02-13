@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
@@ -33,7 +33,7 @@ export async function POST(
   try {
     const supabase = createSupabaseServerClient();
 
-    // 🔐 Get authenticated user
+    //  Get authenticated user
 
     const formData = await request.formData();
     const file = formData.get("file") as File;
@@ -43,7 +43,7 @@ export async function POST(
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
-    // 1️⃣ Verify passport exists
+    // 1 Verify passport exists
     const { data: passport, error: passportError } = await supabase
       .from("material_passports")
       .select("id")
@@ -57,7 +57,7 @@ export async function POST(
       );
     }
 
-    // 2️⃣ Upload file to storage
+    // 2 Upload file to storage
     const fileName = `${passportId}/${Date.now()}-${file.name}`;
 
     const { error: uploadError } = await supabase.storage
@@ -71,14 +71,14 @@ export async function POST(
       throw new Error(`File upload failed: ${uploadError.message}`);
     }
 
-    // 3️⃣ Get public URL
+    // 3 Get public URL
     const { data: urlData } = supabase.storage
       .from("passport-documents")
       .getPublicUrl(fileName);
 
     const fileUrl = urlData.publicUrl;
 
-    // 4️⃣ Insert document record
+    // 4 Insert document record
     const { data: document, error: documentError } = await supabase
       .from("passport_documents")
       .insert({
@@ -96,7 +96,7 @@ export async function POST(
       throw new Error(documentError.message);
     }
 
-    // 5️⃣ Create event
+    // 5 Create event
     await supabase.from("passport_events").insert({
       passport_id: passportId,
       event_type: "document_uploaded",
@@ -156,3 +156,4 @@ export async function GET(
     );
   }
 }
+

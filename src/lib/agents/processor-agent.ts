@@ -1,4 +1,4 @@
-/**
+﻿/**
  * NEXAPRIME - PROCESSOR AGENT (UPDATED WITH THREE-WAY COORDINATION)
  * Gap #2: Processor Three-Way Coordination - FULLY IMPLEMENTED
  */
@@ -134,7 +134,7 @@ export class ProcessorAgent {
         demandContent.material_category;
 
       // Find what input we need to produce this output
-      // Simple mapping: assume 1:1 for MVP (e.g., plastic-scrap → recycled-plastic)
+      // Simple mapping: assume 1:1 for MVP (e.g., plastic-scrap  recycled-plastic)
       const inputNeeded = this.profile.input_materials.find((input: string) =>
         input.includes(outputNeeded.split("-")[0]),
       );
@@ -165,11 +165,11 @@ export class ProcessorAgent {
   }
 
   /**
-   * Propose three-way deals (supplier → processor → buyer)
+   * Propose three-way deals (supplier  processor  buyer)
    * Gap #2: Processor Three-Way Coordination - FULLY IMPLEMENTED!
    */
   private async proposeThreeWayDeals(): Promise<number> {
-    console.log("🔄 Searching for three-way processing opportunities...");
+    console.log(" Searching for three-way processing opportunities...");
 
     let dealsProposed = 0;
 
@@ -263,7 +263,7 @@ export class ProcessorAgent {
       // Check if buyer's max price supports this
       if (outputPrice > buyerContent.max_price) {
         console.log(
-          `Economics don't work: €${outputPrice}/ton > buyer max €${buyerContent.max_price}/ton`,
+          `Economics don't work: ${outputPrice}/ton > buyer max ${buyerContent.max_price}/ton`,
         );
         continue;
       }
@@ -298,11 +298,11 @@ export class ProcessorAgent {
 
       if (threeWayDeal) {
         dealsProposed++;
-        console.log(`✅ Three-way deal structured: ${threeWayDeal.id}`);
+        console.log(` Three-way deal structured: ${threeWayDeal.id}`);
       }
     }
 
-    console.log(`📊 Proposed ${dealsProposed} three-way deals`);
+    console.log(` Proposed ${dealsProposed} three-way deals`);
     return dealsProposed;
   }
 
@@ -456,7 +456,7 @@ export class ProcessorAgent {
         content: {
           type: "three_way_processing_deal",
           title: "Three-Way Processing Opportunity",
-          description: `Processor coordinating: ${params.supplier.material} (${params.supplier.volume} tons/month) → processing → ${params.buyer.material}`,
+          description: `Processor coordinating: ${params.supplier.material} (${params.supplier.volume} tons/month)  processing  ${params.buyer.material}`,
           supplier_post_id: params.supplier.post_id,
           buyer_post_id: params.buyer.post_id,
           three_way_deal_id: threeWayDeal.id,
@@ -528,8 +528,8 @@ export class ProcessorAgent {
 
     const message =
       role === "supplier"
-        ? `A processor wants to buy your material for €${Math.round(annualValue).toLocaleString()}/year. They will process and resell it.`
-        : `A processor can supply you with processed material, saving you €${Math.round(annualValue).toLocaleString()}/year vs virgin material.`;
+        ? `A processor wants to buy your material for ${Math.round(annualValue).toLocaleString()}/year. They will process and resell it.`
+        : `A processor can supply you with processed material, saving you ${Math.round(annualValue).toLocaleString()}/year vs virgin material.`;
 
     await supabase.from("notifications").insert({
       user_id: company.user_id,
@@ -537,7 +537,9 @@ export class ProcessorAgent {
       type: "three_way_deal_proposed",
       title: "Three-Way Processing Deal",
       message,
-      action_url: `/dashboard/deals/three-way/${dealId}`,
+      action_url: `/deals/three-way/${dealId}`,
     });
   }
 }
+
+

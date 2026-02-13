@@ -1,4 +1,4 @@
-/**
+﻿/**
  * CROSS-LOCALITY COORDINATOR
  * Enables NexaApex agents to coordinate across localities
  * Gap #5: Cross-Locality Coordination
@@ -54,7 +54,7 @@ export class CrossLocalityCoordinator {
     deficits: LocalityDeficit[];
     matches: Array<{ surplus: LocalitySurplus; deficit: LocalityDeficit }>;
   }> {
-    console.log("🌐 Analyzing cross-locality opportunities...");
+    console.log(" Analyzing cross-locality opportunities...");
 
     // Get all super agents
     const { data: superAgents } = await supabase
@@ -64,7 +64,7 @@ export class CrossLocalityCoordinator {
       .eq("status", "active");
 
     if (!superAgents || superAgents.length < 2) {
-      console.log("⚠️ Need at least 2 active super agents for cross-locality");
+      console.log(" Need at least 2 active super agents for cross-locality");
       return { surpluses: [], deficits: [], matches: [] };
     }
 
@@ -90,7 +90,7 @@ export class CrossLocalityCoordinator {
     const matches = this.matchSurplusDeficit(surpluses, deficits);
 
     console.log(
-      `📊 Found ${surpluses.length} surpluses, ${deficits.length} deficits, ${matches.length} matches`,
+      ` Found ${surpluses.length} surpluses, ${deficits.length} deficits, ${matches.length} matches`,
     );
 
     return { surpluses, deficits, matches };
@@ -124,7 +124,7 @@ export class CrossLocalityCoordinator {
       .from("materials")
       .select("material_category, monthly_volume")
       .in("company_id", companyIds)
-      .eq("source_type", "requirement");
+      .eq("category", "input");
 
     if (!wasteStreams) return [];
 
@@ -199,7 +199,7 @@ export class CrossLocalityCoordinator {
       .from("materials")
       .select("material_category, monthly_volume, cost_per_unit")
       .in("company_id", companyIds)
-      .eq("source_type", "requirement");
+      .eq("category", "input");
 
     // Get all waste streams (local supply)
     const { data: wasteStreams } = await supabase
@@ -296,7 +296,7 @@ export class CrossLocalityCoordinator {
           surplus.locality,
           deficit.locality,
         );
-        const transportCost = estimatedDistance * 0.15; // €0.15/ton-km
+        const transportCost = estimatedDistance * 0.15; // 0.15/ton-km
         const totalCost = surplus.average_price + transportCost;
 
         if (totalCost < deficit.max_price) {
@@ -329,7 +329,7 @@ export class CrossLocalityCoordinator {
   ): Promise<CrossLocalityDeal | null> {
     try {
       console.log(
-        `🤝 Negotiating cross-locality deal: ${surplus.locality} → ${deficit.locality}`,
+        ` Negotiating cross-locality deal: ${surplus.locality}  ${deficit.locality}`,
       );
 
       // Calculate deal terms
@@ -338,7 +338,7 @@ export class CrossLocalityCoordinator {
         surplus.locality,
         deficit.locality,
       );
-      const transportCost = distance * 0.15; // €0.15/ton-km
+      const transportCost = distance * 0.15; // 0.15/ton-km
       const basePrice = surplus.average_price;
       const pricePerUnit = basePrice + transportCost;
       const totalValue = volume * pricePerUnit * 12; // Annual
@@ -387,7 +387,7 @@ export class CrossLocalityCoordinator {
       // Post announcement on both locality feeds
       await this.announceToLocalities(deal, surplus, deficit);
 
-      console.log(`✅ Cross-locality deal proposed: ${deal.id}`);
+      console.log(` Cross-locality deal proposed: ${deal.id}`);
 
       return deal as unknown as CrossLocalityDeal;
     } catch (error) {
@@ -443,7 +443,7 @@ export class CrossLocalityCoordinator {
       .from("materials")
       .select("company_id")
       .eq("material_category", materialCategory)
-      .eq("source_type", "requirement")
+      .eq("category", "input")
       .in(
         "company_id",
         companies.map((c) => c.id),
@@ -470,11 +470,11 @@ export class CrossLocalityCoordinator {
       content: {
         type: "cross_locality_opportunity",
         title: `Export Opportunity: ${deal.material_category}`,
-        description: `${deficit.locality} needs ${deal.volume_tons_month} tons/month of ${deal.material_category}. NexaApex negotiated deal at €${deal.price_per_unit}/ton.`,
+        description: `${deficit.locality} needs ${deal.volume} tons/month of ${deal.material_category}. NexaApex negotiated deal at ${deal.price_per_unit}/ton.`,
         destination_locality: deficit.locality,
-        volume: deal.volume_tons_month,
+        volume: deal.volume,
         price: deal.price_per_unit,
-        annual_value: deal.total_annual_value,
+        annual_value: deal.total_value,
         role: "supplier",
       },
       locality: surplus.locality,
@@ -488,11 +488,11 @@ export class CrossLocalityCoordinator {
       content: {
         type: "cross_locality_opportunity",
         title: `Import Opportunity: ${deal.material_category}`,
-        description: `${surplus.locality} has ${deal.volume_tons_month} tons/month surplus ${deal.material_category}. NexaApex negotiated supply at €${deal.price_per_unit}/ton (including transport).`,
+        description: `${surplus.locality} has ${deal.volume} tons/month surplus ${deal.material_category}. NexaApex negotiated supply at ${deal.price_per_unit}/ton (including transport).`,
         source_locality: surplus.locality,
-        volume: deal.volume_tons_month,
+        volume: deal.volume,
         price: deal.price_per_unit,
-        annual_value: deal.total_annual_value,
+        annual_value: deal.total_value,
         role: "buyer",
       },
       locality: deficit.locality,
@@ -500,3 +500,4 @@ export class CrossLocalityCoordinator {
     });
   }
 }
+

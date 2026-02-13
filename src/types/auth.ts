@@ -9,7 +9,12 @@ export interface Company {
   user_id: string;
   name: string;
   industry: string;
-  entity_type: "manufacturer" | "recycler" | "logistics" | "energy_recovery";
+  entity_type:
+    | "manufacturer"
+    | "recycler"
+    | "processor"
+    | "logistics"
+    | "energy_recovery";
   locality: string;
   location: {
     address: string;

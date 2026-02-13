@@ -54,16 +54,16 @@ export const ALL_MATERIALS: MaterialSKU[] = MATERIAL_CLASSES.flatMap(
 
 // Class metadata
 export const CLASS_METADATA = {
-  1: { name: "Ferrous Metals", icon: "ðŸ”©", color: "#8B4513" },
-  2: { name: "Non-Ferrous Metals", icon: "ðŸ¥‡", color: "#FFD700" },
-  3: { name: "Polymers & Plastics", icon: "â™»ï¸", color: "#4169E1" },
-  4: { name: "Process Chemicals", icon: "ðŸ§ª", color: "#FF4500" },
-  5: { name: "Organic Waste", icon: "ðŸŒ¿", color: "#228B22" },
-  6: { name: "Energy Streams", icon: "âš¡", color: "#FF8C00" },
-  7: { name: "Textiles", icon: "ðŸ§µ", color: "#FF69B4" },
-  8: { name: "Glass & Ceramics", icon: "ðŸº", color: "#CD853F" },
-  9: { name: "Electronics & Batteries", icon: "ðŸ”‹", color: "#32CD32" },
-  10: { name: "Composites", icon: "ðŸ”—", color: "#9370DB" },
+  1: { name: "Ferrous Metals", icon: "", color: "#8B4513" },
+  2: { name: "Non-Ferrous Metals", icon: "", color: "#FFD700" },
+  3: { name: "Polymers & Plastics", icon: "", color: "#4169E1" },
+  4: { name: "Process Chemicals", icon: "", color: "#FF4500" },
+  5: { name: "Organic Waste", icon: "", color: "#228B22" },
+  6: { name: "Energy Streams", icon: "", color: "#FF8C00" },
+  7: { name: "Textiles", icon: "", color: "#FF69B4" },
+  8: { name: "Glass & Ceramics", icon: "", color: "#CD853F" },
+  9: { name: "Electronics & Batteries", icon: "", color: "#32CD32" },
+  10: { name: "Composites", icon: "", color: "#9370DB" },
 };
 
 /**
@@ -447,3 +447,4 @@ export type {
   MaterialSearchResult,
 };
 export type { WasteTier, QualityTier, ContaminationLevel, MaterialUnit } from "./types";
+

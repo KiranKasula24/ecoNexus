@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/database/supabase";
 
 export async function GET(
@@ -6,7 +6,7 @@ export async function GET(
   context: { params: Promise<{ id: string }> },
 ) {
   try {
-    // ✅ MUST await params in Next 16
+    //  MUST await params in Next 16
     const { id: passportId } = await context.params;
 
     if (!passportId) {
@@ -45,3 +45,4 @@ export async function GET(
     );
   }
 }
+

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -56,7 +56,7 @@ export default function MaterialUploadPage() {
 
           if (!props) {
             materialWarnings.push(
-              `⚠️ Material "${material.material_type}" not found in database. Environmental/economic KPIs may be incomplete.`,
+              ` Material "${material.material_type}" not found in database. Environmental/economic KPIs may be incomplete.`,
             );
           } else {
             // Check if cost is reasonable
@@ -68,11 +68,11 @@ export default function MaterialUploadPage() {
 
               if (costPerUnit > avgPrice * 1.5) {
                 materialWarnings.push(
-                  `💰 ${material.material_type}: Your cost (€${costPerUnit.toFixed(2)}/ton) is significantly above market average (€${avgPrice}/ton). Consider circular alternatives.`,
+                  ` ${material.material_type}: Your cost (${costPerUnit.toFixed(2)}/ton) is significantly above market average (${avgPrice}/ton). Consider circular alternatives.`,
                 );
               } else if (costPerUnit < avgPrice * 0.5) {
                 materialWarnings.push(
-                  `✅ ${material.material_type}: Great price! You're paying below market average.`,
+                  ` ${material.material_type}: Great price! You're paying below market average.`,
                 );
               }
             }
@@ -138,7 +138,7 @@ export default function MaterialUploadPage() {
       {warnings.length > 0 && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
           <h3 className="text-lg font-semibold text-yellow-900 mb-2">
-            ⚠️ Material Analysis Warnings
+             Material Analysis Warnings
           </h3>
           <ul className="space-y-2">
             {warnings.map((warning, index) => (
@@ -154,7 +154,7 @@ export default function MaterialUploadPage() {
       {result && (
         <div className="bg-white shadow rounded-lg p-6">
           <h2 className="text-xl font-semibold mb-4">
-            {result.invoice ? "✅ Upload Successful" : "❌ Upload Failed"}
+            {result.invoice ? " Upload Successful" : " Upload Failed"}
           </h2>
 
           {result.materials_identified &&
@@ -207,16 +207,16 @@ export default function MaterialUploadPage() {
                                 {material.quantity} {material.unit}
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                €{material.cost?.toFixed(2) || "N/A"}
+                                {material.cost?.toFixed(2) || "N/A"}
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
                                 {hasMatch ? (
                                   <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                    ✓ Found
+                                     Found
                                   </span>
                                 ) : (
                                   <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                    ✗ Missing
+                                     Missing
                                   </span>
                                 )}
                               </td>
@@ -263,3 +263,4 @@ export default function MaterialUploadPage() {
     </div>
   );
 }
+

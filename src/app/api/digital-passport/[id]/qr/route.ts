@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import {
   generatePassportQR,
   generatePassportQRSVG,
@@ -10,7 +10,7 @@ export async function GET(
   context: { params: Promise<{ id: string }> },
 ) {
   try {
-    // ✅ MUST await params in your Next version
+    //  MUST await params in your Next version
     const { id: passportId } = await context.params;
 
     if (!passportId) {
@@ -26,7 +26,7 @@ export async function GET(
     const { searchParams } = new URL(request.url);
     const format = searchParams.get("format") || "png";
 
-    // 1️⃣ Verify passport exists
+    // 1 Verify passport exists
     const { data: passport, error } = await supabase
       .from("material_passports")
       .select(
@@ -45,7 +45,7 @@ export async function GET(
 
     console.log("Passport found:", passport);
 
-    // 2️⃣ Generate QR
+    // 2 Generate QR
     if (format === "svg") {
       const qrSvg = await generatePassportQRSVG(passportId);
 
@@ -74,3 +74,4 @@ export async function GET(
     );
   }
 }
+

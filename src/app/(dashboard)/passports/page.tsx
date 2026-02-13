@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -70,7 +70,7 @@ export default function PassportsPage() {
         <div className="p-6 border rounded-lg bg-white">
           <p className="text-gray-600">No passports yet.</p>
           <Link
-            href="/dashboard/materials/flow/create"
+            href="/materials/flow/create"
             className="text-blue-600 hover:underline"
           >
             Create waste-stream passport
@@ -81,7 +81,7 @@ export default function PassportsPage() {
           {items.map((item) => (
             <Link
               key={item.id}
-              href={`/dashboard/passports/${item.id}`}
+              href={`/passports/${item.id}`}
               className="p-4 border rounded-lg bg-white hover:border-blue-300"
             >
               <div className="flex justify-between items-center">
@@ -104,3 +104,4 @@ export default function PassportsPage() {
     </div>
   );
 }
+

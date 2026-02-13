@@ -1,4 +1,4 @@
-/**
+﻿/**
  * MULTI-PARTY DEAL COORDINATOR
  * Structures and executes complex 3+ party symbiosis deals
  * Gap #1: Multi-Party Deal Structuring
@@ -62,14 +62,14 @@ export class MultiPartyCoordinator {
   ): Promise<MultiPartyDeal | null> {
     try {
       console.log(
-        `🔄 Structuring ${opportunity.companies.length}-party deal...`,
+        ` Structuring ${opportunity.companies.length}-party deal...`,
       );
 
       // Step 1: Build individual flows
       const flows = await this.buildFlows(opportunity);
 
       if (flows.length === 0) {
-        console.log("❌ Could not build flows for opportunity");
+        console.log(" Could not build flows for opportunity");
         return null;
       }
 
@@ -109,7 +109,7 @@ export class MultiPartyCoordinator {
         return null;
       }
 
-      console.log(`✅ Multi-party deal structured: ${multiPartyDeal.id}`);
+      console.log(` Multi-party deal structured: ${multiPartyDeal.id}`);
 
       // Step 5: Create individual bilateral deals for each flow
       await this.createBilateralDeals(multiPartyDeal.id, flows);
@@ -149,7 +149,7 @@ export class MultiPartyCoordinator {
         .from("materials")
         .select("*")
         .eq("company_id", nextCompanyId)
-        .eq("source_type", "requirement");
+        .eq("category", "input");
 
       if (!wasteStreams || !requirements) continue;
 
@@ -222,12 +222,12 @@ export class MultiPartyCoordinator {
     for (const flow of flows) {
       // Seller saves disposal cost
       const monthlyVolume = flow.volume;
-      const disposalSavings = monthlyVolume * 50; // €50/ton disposal cost
+      const disposalSavings = monthlyVolume * 50; // 50/ton disposal cost
       const sellingRevenue = monthlyVolume * flow.price_per_unit;
       const sellerValue = disposalSavings + sellingRevenue;
 
       // Buyer saves vs virgin material cost
-      const virginCost = monthlyVolume * 150; // €150/ton virgin cost
+      const virginCost = monthlyVolume * 150; // 150/ton virgin cost
       const purchaseCost = monthlyVolume * flow.price_per_unit;
       const buyerValue = virginCost - purchaseCost;
 
@@ -330,8 +330,8 @@ export class MultiPartyCoordinator {
         company_id: companyId,
         type: "multi_party_deal_proposed",
         title: "Multi-Party Symbiosis Opportunity",
-        message: `NexaApex discovered a ${deal.participating_company_ids.length}-way circular opportunity. Your estimated annual value: €${Math.round(theirValue).toLocaleString()}. Carbon savings: ${Math.round(deal.carbon_savings_tons_year / deal.participating_company_ids.length)} tons CO₂/year.`,
-        action_url: `/dashboard/deals/multi-party/${deal.id}`,
+        message: `NexaApex discovered a ${deal.participating_company_ids.length}-way circular opportunity. Your estimated annual value: ${Math.round(theirValue).toLocaleString()}. Carbon savings: ${Math.round(deal.carbon_savings_tons_year / deal.participating_company_ids.length)} tons CO/year.`,
+        action_url: `/deals/multi-party/${deal.id}`,
       });
     }
   }
@@ -393,7 +393,7 @@ export class MultiPartyCoordinator {
           .eq("multi_party_deal_id", dealId);
 
         console.log(
-          `✅ Multi-party deal ${dealId} fully approved and activated`,
+          ` Multi-party deal ${dealId} fully approved and activated`,
         );
       }
 
@@ -437,3 +437,5 @@ export class MultiPartyCoordinator {
     );
   }
 }
+
+

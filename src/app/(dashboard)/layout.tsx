@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -18,7 +18,7 @@ export default function DashboardLayout({
 
   useEffect(() => {
     if (user && company) {
-      console.log("👤 User logged in, starting agent scheduler...");
+      console.log(" User logged in, starting agent scheduler...");
       startAgentScheduler();
     }
 
@@ -40,3 +40,4 @@ export default function DashboardLayout({
     </ProtectedRoute>
   );
 }
+

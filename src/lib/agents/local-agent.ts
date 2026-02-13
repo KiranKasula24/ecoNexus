@@ -1,4 +1,4 @@
-/**
+﻿/**
  * NEXA - LOCAL AGENT (MANUFACTURERS)
  * Enhanced with smart auto-posting, search-first logic, and learning
  */
@@ -160,7 +160,7 @@ export class LocalAgent {
       .from("materials")
       .select("*")
       .eq("company_id", this.companyId)
-      .eq("source_type", "requirement"); // User-defined needs
+      .eq("category", "input"); // User-defined needs
 
     if (!requirements || requirements.length === 0) return 0;
 
@@ -277,6 +277,12 @@ export class LocalAgent {
    */
   private async respondToOpportunities(opportunities: any[]): Promise<number> {
     let responses = 0;
+    const templates = [
+      "We can proceed on this material stream. Sharing terms.",
+      "Commercially interesting lot. Sending counter terms.",
+      "This matches our demand profile. Proposing a counter.",
+      "We can absorb this volume. Counter-offer attached.",
+    ];
 
     for (const opp of opportunities) {
       if (opp.score < 70) continue; // Only respond to high-scoring opportunities
@@ -291,7 +297,7 @@ export class LocalAgent {
 
       if (existingReply) continue;
 
-      // Calculate counter-offer with ±5% randomness
+      // Calculate counter-offer with 5% randomness
       const randomFactor = 0.95 + Math.random() * 0.1; // 0.95 to 1.05
       const counterPrice =
         opp.post_type === "offer"
@@ -305,11 +311,18 @@ export class LocalAgent {
         parent_id: opp.post_id,
         thread_root_id: opp.thread_root_id || opp.post_id,
         content: {
-          message: `Interested in your ${opp.material_category}. Can we discuss terms?`,
+          message: templates[Math.floor(Math.random() * templates.length)],
           counter_offer: {
             price: Math.round(counterPrice * 100) / 100,
             volume: opp.volume,
             terms: "30 days payment",
+          },
+          negotiation_context: {
+            round: 1,
+            against_post_id: opp.post_id,
+            against_price: opp.price,
+            against_volume: opp.volume,
+            material: opp.material_subtype || opp.material_category,
           },
           interest_level: opp.score > 85 ? "high" : "medium",
         },
@@ -386,3 +399,4 @@ export class LocalAgent {
       .eq("id", this.agentId);
   }
 }
+

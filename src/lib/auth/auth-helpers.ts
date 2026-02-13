@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/database/supabase";
+import { ensureSuperAgentForLocality } from "@/lib/agents/super-agent-registry";
 
 export async function signUp(
   email: string,
@@ -6,7 +7,12 @@ export async function signUp(
   companyData: {
     name: string;
     industry: string;
-    entity_type: "manufacturer" | "recycler" | "logistics" | "energy_recovery";
+    entity_type:
+      | "manufacturer"
+      | "recycler"
+      | "processor"
+      | "logistics"
+      | "energy_recovery";
     address: string;
     city: string;
     country: string;
@@ -76,7 +82,14 @@ export async function signUp(
 
     // 4️⃣ Create agent
     const agentType =
-      companyData.entity_type === "recycler" ? "specialist_recycler" : "local";
+      companyData.entity_type === "recycler"
+        ? "specialist_recycler"
+        : companyData.entity_type === "processor" ||
+            companyData.entity_type === "energy_recovery"
+          ? "specialist_processor"
+          : companyData.entity_type === "logistics"
+            ? "specialist_logistics"
+            : "local";
 
     const { data: agent, error: agentError } = await supabase
       .from("agents")
@@ -96,6 +109,12 @@ export async function signUp(
         agentError,
       );
     }
+
+    await ensureSuperAgentForLocality({
+      locality,
+      city: companyData.city,
+      country: companyData.country,
+    });
 
     console.log("Signup complete!");
 
@@ -162,7 +181,14 @@ export async function signIn(email: string, password: string) {
       console.log("4. Creating agent on first login...");
 
       const agentType =
-        company.entity_type === "recycler" ? "specialist_recycler" : "local";
+        company.entity_type === "recycler"
+          ? "specialist_recycler"
+          : company.entity_type === "processor" ||
+              company.entity_type === "energy_recovery"
+            ? "specialist_processor"
+            : company.entity_type === "logistics"
+              ? "specialist_logistics"
+              : "local";
 
       const { error: agentCreateError } = await supabase.from("agents").insert({
         company_id: company.id,
@@ -176,6 +202,16 @@ export async function signIn(email: string, password: string) {
         console.warn("Agent creation on login failed:", agentCreateError);
       }
     }
+
+    const companyLocation = (company.location || {}) as {
+      city?: string;
+      country?: string;
+    };
+    await ensureSuperAgentForLocality({
+      locality: company.locality,
+      city: companyLocation.city,
+      country: companyLocation.country,
+    });
 
     return {
       user: data.user,

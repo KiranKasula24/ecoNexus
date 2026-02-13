@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -130,7 +130,7 @@ export default function AnalyticsPage() {
       const estimated_revenue = totalMaterialCost * 3; // Assume 3x markup
       const carbon_per_revenue =
         estimated_revenue > 0
-          ? total_carbon_emissions / (estimated_revenue / 1000) // per €1000
+          ? total_carbon_emissions / (estimated_revenue / 1000) // per 1000
           : 0;
 
       // Calculate MCI Score (0-100)
@@ -289,12 +289,12 @@ export default function AnalyticsPage() {
 
       {/* Environmental KPIs */}
       <div>
-        <h2 className="text-2xl font-bold mb-4">🌍 Environmental Impact</h2>
+        <h2 className="text-2xl font-bold mb-4"> Environmental Impact</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <KPICard
             title="Carbon Emissions"
             value={`${Math.round(analytics.environmental_kpis.total_carbon_emissions)} t`}
-            subtitle={`${analytics.environmental_kpis.carbon_per_revenue.toFixed(1)} kg/€1000 revenue`}
+            subtitle={`${analytics.environmental_kpis.carbon_per_revenue.toFixed(1)} kg/1000 revenue`}
             trend="down"
             trendValue="12%"
             color="green"
@@ -328,30 +328,30 @@ export default function AnalyticsPage() {
 
       {/* Economic KPIs */}
       <div>
-        <h2 className="text-2xl font-bold mb-4">💰 Economic Performance</h2>
+        <h2 className="text-2xl font-bold mb-4"> Economic Performance</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <KPICard
             title="Circular Savings"
-            value={`€${analytics.economic_kpis.circular_savings.toLocaleString()}`}
+            value={`${analytics.economic_kpis.circular_savings.toLocaleString()}`}
             subtitle="saved through circular sourcing"
             trend="up"
-            trendValue="€2.3k"
+            trendValue="2.3k"
             color="green"
           />
           <KPICard
             title="Waste-to-Value"
-            value={`€${analytics.economic_kpis.waste_to_value.toLocaleString()}`}
+            value={`${analytics.economic_kpis.waste_to_value.toLocaleString()}`}
             subtitle="from selling waste materials"
             trend="up"
-            trendValue="€1.8k"
+            trendValue="1.8k"
             color="blue"
           />
           <KPICard
             title="Cost Avoidance"
-            value={`€${analytics.economic_kpis.cost_avoidance.toLocaleString()}`}
+            value={`${analytics.economic_kpis.cost_avoidance.toLocaleString()}`}
             subtitle="total financial benefit"
             trend="up"
-            trendValue="€4.1k"
+            trendValue="4.1k"
             color="purple"
           />
           <KPICard
@@ -367,7 +367,7 @@ export default function AnalyticsPage() {
 
       {/* Industry Comparison */}
       <div className="bg-white shadow rounded-lg p-6">
-        <h2 className="text-2xl font-bold mb-6">📊 Industry Benchmarking</h2>
+        <h2 className="text-2xl font-bold mb-6"> Industry Benchmarking</h2>
         <div className="space-y-6">
           <BenchmarkBar
             label="MCI Score"
@@ -393,7 +393,7 @@ export default function AnalyticsPage() {
       {/* Carbon Breakdown Chart */}
       <div className="bg-white shadow rounded-lg p-6">
         <h2 className="text-2xl font-bold mb-6">
-          📉 Carbon Footprint Breakdown
+           Carbon Footprint Breakdown
         </h2>
         <CarbonBreakdownChart
           virginEmissions={
@@ -408,12 +408,12 @@ export default function AnalyticsPage() {
       {/* Recommendations */}
       <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-6">
         <h2 className="text-xl font-bold text-green-900 mb-4">
-          💡 Recommendations to Improve MCI
+           Recommendations to Improve MCI
         </h2>
         <ul className="space-y-3">
           {analytics.environmental_kpis.circular_content_percentage < 30 && (
             <li className="flex items-start gap-3">
-              <span className="text-green-600 text-xl">•</span>
+              <span className="text-green-600 text-xl"></span>
               <div>
                 <p className="font-medium text-green-900">
                   Increase Circular Material Sourcing
@@ -431,7 +431,7 @@ export default function AnalyticsPage() {
           )}
           {analytics.environmental_kpis.waste_diversion_rate < 70 && (
             <li className="flex items-start gap-3">
-              <span className="text-green-600 text-xl">•</span>
+              <span className="text-green-600 text-xl"></span>
               <div>
                 <p className="font-medium text-green-900">
                   Improve Waste Diversion
@@ -447,13 +447,13 @@ export default function AnalyticsPage() {
           )}
           {analytics.economic_kpis.waste_to_value < 1000 && (
             <li className="flex items-start gap-3">
-              <span className="text-green-600 text-xl">•</span>
+              <span className="text-green-600 text-xl"></span>
               <div>
                 <p className="font-medium text-green-900">
                   Monetize Waste Streams
                 </p>
                 <p className="text-sm text-green-700">
-                  You're only capturing €
+                  You're only capturing 
                   {analytics.economic_kpis.waste_to_value.toLocaleString()} in
                   waste value. Activate your Nexa agent to automatically find
                   buyers.
@@ -505,10 +505,10 @@ function MCIGauge({ score }: { score: number }) {
 }
 
 function getMCIRating(score: number): string {
-  if (score >= 80) return "🌟 Excellent";
-  if (score >= 60) return "✅ Good";
-  if (score >= 40) return "⚠️ Fair";
-  return "❌ Needs Improvement";
+  if (score >= 80) return " Excellent";
+  if (score >= 60) return " Good";
+  if (score >= 40) return " Fair";
+  return " Needs Improvement";
 }
 
 interface KPICardProps {
@@ -550,7 +550,7 @@ function KPICard({
           <span
             className={`text-xs font-medium ${trend === "up" ? "text-green-600" : "text-red-600"}`}
           >
-            {trend === "up" ? "↑" : "↓"} {trendValue}
+            {trend === "up" ? "" : ""} {trendValue}
           </span>
         )}
       </div>
@@ -622,7 +622,7 @@ function CarbonBreakdownChart({
               Virgin Materials
             </span>
             <span className="text-sm text-gray-600">
-              {Math.round(virginEmissions)} tons CO₂
+              {Math.round(virginEmissions)} tons CO
             </span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-8">
@@ -643,7 +643,7 @@ function CarbonBreakdownChart({
               Circular Materials
             </span>
             <span className="text-sm text-gray-600">
-              {Math.round(circularEmissions)} tons CO₂
+              {Math.round(circularEmissions)} tons CO
             </span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-8">
@@ -661,7 +661,7 @@ function CarbonBreakdownChart({
         <p className="text-sm text-blue-900">
           <strong>Potential Savings:</strong> If you increased circular content
           to 50%, you could save approximately{" "}
-          <strong>{Math.round(virginEmissions * 0.5 * 0.68)} tons CO₂</strong>{" "}
+          <strong>{Math.round(virginEmissions * 0.5 * 0.68)} tons CO</strong>{" "}
           annually (equivalent to planting{" "}
           {Math.round((virginEmissions * 0.5 * 0.68) / 21)} trees).
         </p>
@@ -669,3 +669,4 @@ function CarbonBreakdownChart({
     </div>
   );
 }
+
