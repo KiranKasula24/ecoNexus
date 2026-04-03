@@ -33,6 +33,9 @@ interface SuperInsight {
   title: string;
   description: string;
   tag: string;
+  relationType?: "many_to_one" | "one_to_many" | "cross_locality";
+  estimatedSavings?: number;
+  actionableOfferPostId?: string;
 }
 
 export default function NexusPage() {
@@ -290,13 +293,37 @@ export default function NexusPage() {
         <div className="space-y-2">
           {superInsights.map((insight) => (
             <div key={insight.id} className="bg-white rounded p-3 border border-red-100">
-              <div className="flex items-center justify-between gap-3">
-                <p className="font-medium text-gray-900">{insight.title}</p>
-                <span className="text-xs px-2 py-1 rounded bg-red-100 text-red-800">
-                  {insight.tag}
-                </span>
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex-1">
+                  <p className="font-medium text-gray-900">{insight.title}</p>
+                  <p className="text-sm text-gray-700 mt-1">{insight.description}</p>
+                  {typeof insight.estimatedSavings === "number" && (
+                    <p className="text-xs text-emerald-700 mt-1">
+                      Estimated annual savings: EUR {insight.estimatedSavings.toLocaleString()}
+                    </p>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs px-2 py-1 rounded bg-red-100 text-red-800">
+                    {insight.tag}
+                  </span>
+                  {insight.actionableOfferPostId && (
+                    <button
+                      onClick={() => {
+                        const matched = posts.find((p) => p.id === insight.actionableOfferPostId);
+                        if (matched) {
+                          buyOffer(matched);
+                        } else {
+                          alert("Offer not available now. Refresh and try again.");
+                        }
+                      }}
+                      className="text-xs px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700"
+                    >
+                      Create Deal
+                    </button>
+                  )}
+                </div>
               </div>
-              <p className="text-sm text-gray-700 mt-1">{insight.description}</p>
             </div>
           ))}
         </div>
@@ -896,6 +923,13 @@ function buildSuperInsights(posts: FeedPost[]): SuperInsight[] {
         p.content?.summary ||
         "Super-agent has identified a multi-party circular opportunity.",
       tag: "Super Agent",
+      relationType: p.content?.relation_type,
+      estimatedSavings: Number(
+        p.content?.financial_estimate?.estimated_savings ||
+          p.content?.estimated_savings ||
+          0,
+      ),
+      actionableOfferPostId: p.content?.source_offer_post_id || p.content?.offer_post_id,
     });
   }
 
@@ -919,9 +953,106 @@ function buildSuperInsights(posts: FeedPost[]): SuperInsight[] {
         title: `Cross-company match on ${offer.content?.material_category || "material"}`,
         description: `${offer.company.name} can supply ${matchingRequest.company.name} in ${offer.locality}. Create a coordinated 3-round negotiation.`,
         tag: "Market Match",
+        relationType: "many_to_one",
+        estimatedSavings: Math.round(
+          Number(offer.content?.volume || 0) * Number(offer.content?.price || 0) * 0.12,
+        ),
+        actionableOfferPostId: offer.id,
       });
     }
     if (insights.length >= 5) break;
+  }
+
+  // Simulated NexaApex same-locality multi-party opportunities:
+  // many_to_one: 2 sellers -> 1 buyer in same locality
+  const localityKeys = Array.from(new Set(posts.map((p) => p.locality).filter(Boolean)));
+  for (const locality of localityKeys) {
+    const localityOffers = offers.filter((o) => o.locality === locality);
+    const localityRequests = requests.filter((r) => r.locality === locality);
+    if (localityOffers.length < 2 || localityRequests.length < 1) continue;
+
+    const byMaterial = new Map<string, FeedPost[]>();
+    for (const offer of localityOffers) {
+      const m = String(
+        offer.content?.material_category || offer.content?.material_subtype || offer.content?.material || "",
+      ).toLowerCase();
+      if (!m) continue;
+      byMaterial.set(m, [...(byMaterial.get(m) || []), offer]);
+    }
+
+    for (const [material, materialOffers] of byMaterial.entries()) {
+      const uniqueSellers = Array.from(
+        new Map(materialOffers.map((o) => [o.agent.company_id, o])).values(),
+      );
+      if (uniqueSellers.length < 2) continue;
+      const buyerReq = localityRequests.find((r) => {
+        const rm = String(
+          r.content?.material_category || r.content?.material_subtype || "",
+        ).toLowerCase();
+        return rm && (rm.includes(material) || material.includes(rm));
+      });
+      if (!buyerReq) continue;
+      const anchorOffer = uniqueSellers.sort(
+        (a, b) => Number(a.content?.price || 0) - Number(b.content?.price || 0),
+      )[0];
+      insights.push({
+        id: `sim-local-many-to-one-${locality}-${material}`,
+        title: `Simulated same-locality many-to-one (${locality})`,
+        description: `NexaApex can bundle ${uniqueSellers.length} suppliers for one buyer on ${material}.`,
+        tag: "Simulated Super",
+        relationType: "many_to_one",
+        estimatedSavings: Math.round(
+          uniqueSellers.reduce(
+            (sum, s) => sum + Number(s.content?.volume || 0) * Number(s.content?.price || 0),
+            0,
+          ) * 0.1,
+        ),
+        actionableOfferPostId: anchorOffer.id,
+      });
+      break;
+    }
+    if (insights.length >= 8) break;
+  }
+
+  // Simulated NexaApex cross-locality opportunities:
+  // one locality supplies, another locality has 2+ buyers
+  const offersByLocality = new Map<string, FeedPost[]>();
+  for (const o of offers) {
+    offersByLocality.set(o.locality, [...(offersByLocality.get(o.locality) || []), o]);
+  }
+  for (const [sourceLocality, srcOffers] of offersByLocality.entries()) {
+    const sourceTop = srcOffers[0];
+    if (!sourceTop) continue;
+    const sourceMaterial = String(
+      sourceTop.content?.material_category ||
+        sourceTop.content?.material_subtype ||
+        sourceTop.content?.material ||
+        "",
+    ).toLowerCase();
+    if (!sourceMaterial) continue;
+    const targetRequests = requests.filter((r) => {
+      if (r.locality === sourceLocality) return false;
+      const rm = String(
+        r.content?.material_category || r.content?.material_subtype || "",
+      ).toLowerCase();
+      return rm && (rm.includes(sourceMaterial) || sourceMaterial.includes(rm));
+    });
+    const uniqueTargetBuyers = Array.from(
+      new Map(targetRequests.map((r) => [r.agent.company_id, r])).values(),
+    );
+    if (uniqueTargetBuyers.length < 2) continue;
+    insights.push({
+      id: `sim-cross-${sourceLocality}-${uniqueTargetBuyers[0].locality}-${sourceMaterial}`,
+      title: `Simulated cross-locality multiparty (${sourceLocality} -> ${uniqueTargetBuyers[0].locality})`,
+      description: `NexaApex can route one supply cluster to multiple remote buyers on ${sourceMaterial}.`,
+      tag: "Simulated Super",
+      relationType: "cross_locality",
+      estimatedSavings: Math.round(
+        Number(sourceTop.content?.volume || 0) * Number(sourceTop.content?.price || 0) * 0.14,
+      ),
+      actionableOfferPostId: sourceTop.id,
+    });
+    if (insights.length >= 10) break;
   }
 
   const ferrousSignal = posts.some((p) =>
@@ -952,7 +1083,7 @@ function buildSuperInsights(posts: FeedPost[]): SuperInsight[] {
     });
   }
 
-  return insights.slice(0, 6);
+  return insights.slice(0, 10);
 }
 
 function getAgentBadge(agentType: string) {

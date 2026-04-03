@@ -1,6 +1,7 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/database/supabase";
 import {
@@ -22,6 +23,7 @@ interface MaterialRequirement {
 }
 
 export default function MaterialRequirementsPage() {
+  const router = useRouter();
   const { company } = useAuth();
   const [requirements, setRequirements] = useState<MaterialRequirement[]>([]);
   const [formData, setFormData] = useState({
@@ -148,6 +150,7 @@ export default function MaterialRequirementsPage() {
     }
 
     alert(`Saved ${requirements.length} material requirements.`);
+    router.push("/materials/flow/create");
   };
 
   // Get all categories for filter
@@ -338,7 +341,7 @@ export default function MaterialRequirementsPage() {
                 {selectedMaterial.recyclability_score}%
               </div>
               <div>
-                <span className="font-medium">Market Price:</span> 
+                <span className="font-medium">Market Price:</span>
                 {selectedMaterial.market_price.min}-
                 {selectedMaterial.market_price.max}/ton
               </div>
@@ -459,7 +462,6 @@ export default function MaterialRequirementsPage() {
                 Total Monthly Cost (estimated):
               </span>
               <span className="text-lg font-bold text-gray-900">
-                
                 {requirements
                   .reduce((sum, req) => {
                     const cost = req.volume * req.current_cost_per_unit;
@@ -476,4 +478,3 @@ export default function MaterialRequirementsPage() {
     </div>
   );
 }
-

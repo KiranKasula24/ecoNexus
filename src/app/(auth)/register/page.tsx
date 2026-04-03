@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -19,7 +19,6 @@ export default function RegisterPage() {
     entityType: "manufacturer" as
       | "manufacturer"
       | "recycler"
-      | "processor"
       | "logistics"
       | "energy_recovery",
     address: "",
@@ -45,6 +44,7 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
+      console.log("Attempting sign up...", formData.email);
       await signUp(formData.email, formData.password, {
         name: formData.companyName,
         industry: formData.industry,
@@ -53,47 +53,55 @@ export default function RegisterPage() {
         city: formData.city,
         country: formData.country,
       });
-
-      // Success - redirect to dashboard
-      router.push("/");
+      console.log("Sign up successful, redirecting to setup...");
+      router.push("/setup");
     } catch (err: any) {
       console.error("Registration error:", err);
       setError(err.message || "Registration failed. Please try again.");
     } finally {
+      console.log("Setting loading to false");
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        {/* Header */}
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Join EcoNexus
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Deploy your AI agent and start finding circular opportunities
-          </p>
-        </div>
+    <div className="min-h-screen bg-gray-900 p-4 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
+      {/* Center horizontally */}
+      <div className="flex justify-center">
+        <div className="w-full max-w-md bg-gray-800 rounded-2xl shadow-lg border border-gray-700 flex flex-col">
+          {/* Header */}
+          <div className="p-8 pb-4">
+            <div className="flex flex-col items-center">
+              <div className="relative group">
+                {/* Glowing logo */}
+                <img
+                  src="logo.png"
+                  alt="EcoNexus Logo"
+                  className="w-32 rounded-3xl relative z-10 transition-all duration-500
+                             group-hover:scale-110 group-hover:shadow-[0_0_25px_#34d399]
+                             group-hover:brightness-125"
+                />
+              </div>
 
-        {/* Form */}
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
-            <div className="rounded-md bg-red-50 p-4">
-              <p className="text-sm text-red-800">{error}</p>
+              <h1 className="text-xl font-bold text-white text-center mt-4">
+                Join EcoNexus
+              </h1>
+              <p className="text-gray-400 text-sm text-center mt-1">
+                Deploy your AI agent and start finding circular opportunities
+              </p>
             </div>
-          )}
+          </div>
 
-          <div className="rounded-md shadow-sm space-y-4">
-            {/* Email */}
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Email Address *
-              </label>
+          {/* Form */}
+          <div className="px-8 pb-8">
+            {error && (
+              <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500 text-red-400 text-sm">
+                {error}
+              </div>
+            )}
+
+            <form className="space-y-4" onSubmit={handleSubmit}>
+              {/* Email */}
               <input
                 id="email"
                 name="email"
@@ -103,19 +111,11 @@ export default function RegisterPage() {
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
                 }
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="you@company.com"
+                placeholder="Email Address"
+                className="w-full px-4 py-2 rounded-lg bg-gray-700 text-white border border-gray-600 placeholder-gray-400 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
               />
-            </div>
 
-            {/* Password */}
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Password *
-              </label>
+              {/* Password */}
               <input
                 id="password"
                 name="password"
@@ -125,19 +125,11 @@ export default function RegisterPage() {
                 onChange={(e) =>
                   setFormData({ ...formData, password: e.target.value })
                 }
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="Min 6 characters"
+                placeholder="Password (min 6 characters)"
+                className="w-full px-4 py-2 rounded-lg bg-gray-700 text-white border border-gray-600 placeholder-gray-400 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
               />
-            </div>
 
-            {/* Confirm Password */}
-            <div>
-              <label
-                htmlFor="confirmPassword"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Confirm Password *
-              </label>
+              {/* Confirm Password */}
               <input
                 id="confirmPassword"
                 name="confirmPassword"
@@ -147,187 +139,121 @@ export default function RegisterPage() {
                 onChange={(e) =>
                   setFormData({ ...formData, confirmPassword: e.target.value })
                 }
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                placeholder="Confirm Password"
+                className="w-full px-4 py-2 rounded-lg bg-gray-700 text-white border border-gray-600 placeholder-gray-400 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
               />
-            </div>
 
-            {/* Divider */}
-            <div className="border-t border-gray-200 pt-4">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
-                Company Information
-              </h3>
-            </div>
+              {/* Divider */}
+              <div className="pt-2 border-t border-gray-700 space-y-4">
+                <input
+                  id="companyName"
+                  name="companyName"
+                  type="text"
+                  required
+                  value={formData.companyName}
+                  onChange={(e) =>
+                    setFormData({ ...formData, companyName: e.target.value })
+                  }
+                  placeholder="Company Name"
+                  className="w-full px-4 py-2 rounded-lg bg-gray-700 text-white border border-gray-600 placeholder-gray-400 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                />
 
-            {/* Company Name */}
-            <div>
-              <label
-                htmlFor="companyName"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Company Name *
-              </label>
-              <input
-                id="companyName"
-                name="companyName"
-                type="text"
-                required
-                value={formData.companyName}
-                onChange={(e) =>
-                  setFormData({ ...formData, companyName: e.target.value })
-                }
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="ACME Manufacturing"
-              />
-            </div>
+                <input
+                  id="industry"
+                  name="industry"
+                  type="text"
+                  required
+                  value={formData.industry}
+                  onChange={(e) =>
+                    setFormData({ ...formData, industry: e.target.value })
+                  }
+                  placeholder="Industry (e.g., Metal Fabrication, Recycling)"
+                  className="w-full px-4 py-2 rounded-lg bg-gray-700 text-white border border-gray-600 placeholder-gray-400 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                />
 
-            {/* Industry */}
-            <div>
-              <label
-                htmlFor="industry"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Industry *
-              </label>
-              <input
-                id="industry"
-                name="industry"
-                type="text"
-                required
-                value={formData.industry}
-                onChange={(e) =>
-                  setFormData({ ...formData, industry: e.target.value })
-                }
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="e.g., Metal Fabrication, Recycling"
-              />
-            </div>
+                <select
+                  id="entityType"
+                  name="entityType"
+                  value={formData.entityType}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      entityType: e.target.value as any,
+                    })
+                  }
+                  className="w-full px-4 py-2 rounded-lg bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                >
+                  <option value="manufacturer">Manufacturing Company</option>
+                  <option value="recycler">Recycler / Waste Processor</option>
+                  <option value="logistics">Logistics Provider</option>
+                  <option value="energy_recovery">
+                    Energy Recovery Facility
+                  </option>
+                </select>
 
-            {/* Entity Type - CRITICAL */}
-            <div>
-              <label
-                htmlFor="entityType"
-                className="block text-sm font-medium text-gray-700"
+                <input
+                  id="address"
+                  name="address"
+                  type="text"
+                  required
+                  value={formData.address}
+                  onChange={(e) =>
+                    setFormData({ ...formData, address: e.target.value })
+                  }
+                  placeholder="Address"
+                  className="w-full px-4 py-2 rounded-lg bg-gray-700 text-white border border-gray-600 placeholder-gray-400 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                />
+
+                <div className="grid grid-cols-2 gap-4">
+                  <input
+                    id="city"
+                    name="city"
+                    type="text"
+                    required
+                    value={formData.city}
+                    onChange={(e) =>
+                      setFormData({ ...formData, city: e.target.value })
+                    }
+                    placeholder="City"
+                    className="px-4 py-2 rounded-lg bg-gray-700 text-white border border-gray-600 placeholder-gray-400 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                  />
+
+                  <input
+                    id="country"
+                    name="country"
+                    type="text"
+                    required
+                    value={formData.country}
+                    onChange={(e) =>
+                      setFormData({ ...formData, country: e.target.value })
+                    }
+                    placeholder="Country"
+                    className="px-4 py-2 rounded-lg bg-gray-700 text-white border border-gray-600 placeholder-gray-400 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-lg py-2.5 transition"
               >
-                Entity Type *
-              </label>
-              <select
-                id="entityType"
-                name="entityType"
-                value={formData.entityType}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    entityType: e.target.value as any,
-                  })
-                }
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              >
-                <option value="manufacturer">Manufacturing Company</option>
-                <option value="recycler">Recycler / Waste Processor</option>
-                <option value="processor">Material Processor</option>
-                <option value="logistics">Logistics Provider</option>
-                <option value="energy_recovery">
-                  Energy Recovery Facility
-                </option>
-              </select>
-              <p className="mt-1 text-xs text-gray-500">
-                This determines your agent type and capabilities
+                {loading ? "Creating Account..." : "Register & Deploy Agent"}
+              </button>
+
+              <p className="text-center text-gray-400 text-sm">
+                Already have an account?{" "}
+                <Link
+                  href="/login"
+                  className="text-emerald-400 hover:underline"
+                >
+                  Sign in
+                </Link>
               </p>
-            </div>
-
-            {/* Address */}
-            <div>
-              <label
-                htmlFor="address"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Address *
-              </label>
-              <input
-                id="address"
-                name="address"
-                type="text"
-                required
-                value={formData.address}
-                onChange={(e) =>
-                  setFormData({ ...formData, address: e.target.value })
-                }
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="123 Industrial Street"
-              />
-            </div>
-
-            {/* City */}
-            <div>
-              <label
-                htmlFor="city"
-                className="block text-sm font-medium text-gray-700"
-              >
-                City *
-              </label>
-              <input
-                id="city"
-                name="city"
-                type="text"
-                required
-                value={formData.city}
-                onChange={(e) =>
-                  setFormData({ ...formData, city: e.target.value })
-                }
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="Munich"
-              />
-            </div>
-
-            {/* Country */}
-            <div>
-              <label
-                htmlFor="country"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Country *
-              </label>
-              <input
-                id="country"
-                name="country"
-                type="text"
-                required
-                value={formData.country}
-                onChange={(e) =>
-                  setFormData({ ...formData, country: e.target.value })
-                }
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="Germany"
-              />
-            </div>
+            </form>
           </div>
-
-          {/* Submit Button */}
-          <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? "Creating Account..." : "Register & Deploy Agent"}
-            </button>
-          </div>
-
-          {/* Login Link */}
-          <div className="text-center">
-            <p className="text-sm text-gray-600">
-              Already have an account?{" "}
-              <Link
-                href="/login"
-                className="font-medium text-blue-600 hover:text-blue-500"
-              >
-                Sign in
-              </Link>
-            </p>
-          </div>
-        </form>
+        </div>
       </div>
     </div>
   );
 }
-

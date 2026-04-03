@@ -24,7 +24,7 @@ export function buildCompanyKpiInsert(
     (w) => w.monthly_volume,
   );
 
-  const totalWasteCost = sumBy(waste, (w) => w.current_disposal_cost);
+  const totalWasteCost = sumBy(waste, (w) => w.current_disposal_cost || 0);
   const potentialCircularRevenue = sumBy(waste, (w) => w.potential_value || 0);
 
   const mciScore = totalInput > 0 ? (1 - totalWaste / totalInput) * 100 : 0;
@@ -38,7 +38,7 @@ export function buildCompanyKpiInsert(
   );
   const carbonSavedPotential = sumBy(
     waste.filter((w) => w.classification !== "landfill"),
-    (w) => materialById.get(w.material_id)?.carbon_footprint || 0,
+    (w) => (w.material_id ? materialById.get(w.material_id)?.carbon_footprint : 0) || 0,
   );
 
   const emissionIntensity =

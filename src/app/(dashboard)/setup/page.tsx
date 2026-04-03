@@ -521,7 +521,7 @@ function RecyclerSetup() {
         throw agentResponse.error;
       }
 
-      router.push("/");
+      router.push("/materials/requirements");
     } catch (error) {
       console.error("Setup error:", error);
       alert("Failed to complete setup. Please try again.");
@@ -991,7 +991,7 @@ function ProcessorSetup() {
         throw agentResponse.error;
       }
 
-      router.push("/");
+      router.push("/materials/requirements");
     } catch (error) {
       console.error("Setup error:", error);
       alert("Failed to complete setup. Please try again.");
@@ -1474,7 +1474,7 @@ function LogisticsSetup() {
         throw agentResponse.error;
       }
 
-      router.push("/");
+      router.push("/materials/requirements");
     } catch (error) {
       console.error("Setup error:", error);
       alert("Failed to complete setup. Please try again.");

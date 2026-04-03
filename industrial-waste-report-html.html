@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Industrial Waste Report 2025</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0b0c0e;
+    --surface: #111316;
+    --card: #161a1f;
+    --border: #1f2530;
+    --accent: #e8ff47;
+    --accent2: #ff5e3a;
+    --accent3: #3ae8c8;
+    --muted: #5a6375;
+    --text: #d8dde8;
+    --light: #f0f3fa;
+    --serif: 'DM Serif Display', serif;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'Sora', sans-serif;
+    --display: 'Bebas Neue', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative;
+    padding: 100px 60px 80px;
+    overflow: hidden;
+    border-bottom: 1px solid var(--border);
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 80% 20%, rgba(232,255,71,0.07) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 60% at 10% 80%, rgba(58,232,200,0.05) 0%, transparent 70%),
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 39px,
+        rgba(255,255,255,0.02) 40px
+      );
+  }
+  .hero-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    text-transform: uppercase;
+    border: 1px solid rgba(232,255,71,0.3);
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 2px;
+    margin-bottom: 28px;
+  }
+  .hero h1 {
+    font-family: var(--display);
+    font-size: clamp(52px, 8vw, 108px);
+    line-height: 0.92;
+    letter-spacing: 0.02em;
+    color: var(--light);
+    max-width: 820px;
+    position: relative;
+  }
+  .hero h1 span {
+    color: var(--accent);
+    display: block;
+  }
+  .hero-sub {
+    margin-top: 28px;
+    font-size: 16px;
+    color: var(--muted);
+    max-width: 540px;
+    font-weight: 300;
+    position: relative;
+  }
+  .hero-meta {
+    margin-top: 48px;
+    display: flex;
+    gap: 40px;
+    position: relative;
+  }
+  .hero-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .hero-stat-num {
+    font-family: var(--display);
+    font-size: 36px;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .hero-stat-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .hero-scroll {
+    position: absolute;
+    right: 60px;
+    bottom: 40px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    writing-mode: vertical-rl;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .hero-scroll::before {
+    content: '';
+    width: 1px;
+    height: 48px;
+    background: linear-gradient(to bottom, var(--accent), transparent);
+  }
+
+  /* ── NAV / TOC ── */
+  .toc {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(11,12,14,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 60px;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .toc::-webkit-scrollbar { display: none; }
+  .toc a {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 16px 20px;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .toc a:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  /* ── SECTIONS ── */
+  .section {
+    padding: 80px 60px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  .section-title {
+    font-family: var(--display);
+    font-size: clamp(36px, 5vw, 60px);
+    color: var(--light);
+    letter-spacing: 0.02em;
+    line-height: 1;
+    margin-bottom: 28px;
+  }
+  .section-intro {
+    font-size: 16px;
+    color: var(--text);
+    max-width: 760px;
+    margin-bottom: 52px;
+    font-weight: 300;
+    line-height: 1.8;
+    border-left: 3px solid var(--accent);
+    padding-left: 20px;
+  }
+
+  /* ── INDUSTRY CARDS ── */
+  .industry-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 2px;
+  }
+  .industry-card {
+    background: var(--card);
+    padding: 32px;
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.25s;
+  }
+  .industry-card:hover {
+    border-color: rgba(232,255,71,0.3);
+  }
+  .industry-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent-bar, var(--accent));
+    opacity: 0.6;
+  }
+  .card-icon {
+    font-size: 28px;
+    margin-bottom: 16px;
+    display: block;
+  }
+  .card-title {
+    font-family: var(--serif);
+    font-size: 20px;
+    color: var(--light);
+    margin-bottom: 10px;
+  }
+  .card-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 20px;
+  }
+  .card-section {
+    margin-top: 16px;
+  }
+  .card-section-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent-bar, var(--accent));
+    margin-bottom: 8px;
+  }
+  .card-section-text {
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.65;
+  }
+  .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 16px;
+  }
+  .tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    padding: 3px 10px;
+    border-radius: 2px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+  .tag.danger { border-color: rgba(255,94,58,0.4); color: #ff8a6e; }
+  .tag.ok { border-color: rgba(58,232,200,0.3); color: #3ae8c8; }
+
+  /* ── DIVIDER STATS ROW ── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border: 1px solid var(--border);
+    margin: 52px 0;
+  }
+  .stat-block {
+    padding: 32px 28px;
+    border-right: 1px solid var(--border);
+    position: relative;
+  }
+  .stat-block:last-child { border-right: none; }
+  .stat-num {
+    font-family: var(--display);
+    font-size: 44px;
+    color: var(--accent);
+    line-height: 1;
+    display: block;
+  }
+  .stat-unit {
+    font-family: var(--display);
+    font-size: 22px;
+    color: var(--muted);
+  }
+  .stat-desc {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 8px;
+    line-height: 1.4;
+  }
+
+  /* ── WASTE FLOW DIAGRAM ── */
+  .flow-container {
+    display: grid;
+    grid-template-columns: 1fr 40px 1fr 40px 1fr;
+    gap: 0;
+    align-items: center;
+    margin: 40px 0;
+  }
+  .flow-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 24px 20px;
+    text-align: center;
+  }
+  .flow-box-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent3);
+    margin-bottom: 8px;
+  }
+  .flow-box-items {
+    list-style: none;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.8;
+  }
+  .flow-arrow {
+    text-align: center;
+    font-size: 22px;
+    color: var(--muted);
+  }
+
+  /* ── PROBLEM TABLE ── */
+  .problem-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-top: 40px;
+  }
+  .problem-table th {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 14px 20px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .problem-table td {
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(31,37,48,0.8);
+    vertical-align: top;
+    line-height: 1.6;
+  }
+  .problem-table tr:hover td { background: rgba(22,26,31,0.6); }
+  .severity {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 2px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    font-weight: 500;
+  }
+  .sev-critical { background: rgba(255,94,58,0.15); color: #ff5e3a; border: 1px solid rgba(255,94,58,0.3); }
+  .sev-high { background: rgba(255,180,50,0.1); color: #ffb432; border: 1px solid rgba(255,180,50,0.25); }
+  .sev-medium { background: rgba(58,232,200,0.08); color: #3ae8c8; border: 1px solid rgba(58,232,200,0.2); }
+
+  /* ── OPPORTUNITY CARDS ── */
+  .opp-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    margin-top: 40px;
+  }
+  .opp-card {
+    padding: 32px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    position: relative;
+  }
+  .opp-num {
+    font-family: var(--display);
+    font-size: 72px;
+    line-height: 0.9;
+    color: rgba(232,255,71,0.08);
+    position: absolute;
+    top: 16px; right: 20px;
+    font-weight: 400;
+  }
+  .opp-title {
+    font-family: var(--serif);
+    font-size: 18px;
+    color: var(--light);
+    margin-bottom: 10px;
+  }
+  .opp-text {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+  .opp-badge {
+    margin-top: 16px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+
+  /* ── CONCLUSION ── */
+  .conclusion {
+    padding: 80px 60px;
+    background: var(--surface);
+    position: relative;
+    overflow: hidden;
+  }
+  .conclusion::before {
+    content: 'WASTE';
+    position: absolute;
+    bottom: -30px; right: -20px;
+    font-family: var(--display);
+    font-size: 220px;
+    color: rgba(232,255,71,0.03);
+    line-height: 1;
+    pointer-events: none;
+  }
+  .conclusion-text {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(20px, 2.5vw, 28px);
+    color: var(--light);
+    max-width: 820px;
+    line-height: 1.55;
+    margin-bottom: 32px;
+  }
+  .conclusion-body {
+    font-size: 15px;
+    max-width: 760px;
+    color: var(--text);
+    line-height: 1.85;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    padding: 28px 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--border);
+  }
+  footer span {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .hero, .section, footer { padding-left: 24px; padding-right: 24px; }
+    .hero-scroll { display: none; }
+    .toc { padding: 0 24px; }
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .stat-block:nth-child(2) { border-right: none; }
+    .opp-grid { grid-template-columns: 1fr; }
+    .flow-container { grid-template-columns: 1fr; }
+    .flow-arrow { transform: rotate(90deg); }
+    .hero-meta { flex-wrap: wrap; gap: 24px; }
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .hero h1, .hero-sub, .hero-meta {
+    animation: fadeUp 0.8s ease both;
+  }
+  .hero-sub { animation-delay: 0.15s; }
+  .hero-meta { animation-delay: 0.3s; }
+
+  /* card color variants */
+  .c1 { --accent-bar: #e8ff47; }
+  .c2 { --accent-bar: #ff5e3a; }
+  .c3 { --accent-bar: #3ae8c8; }
+  .c4 { --accent-bar: #a78bfa; }
+  .c5 { --accent-bar: #fb923c; }
+  .c6 { --accent-bar: #f472b6; }
+  .c7 { --accent-bar: #60a5fa; }
+  .c8 { --accent-bar: #34d399; }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-tag">Research Report · March 2025</div>
+  <h1>How Industries<span>Produce & Waste</span></h1>
+  <p class="hero-sub">A sector-by-sector analysis of raw material acquisition, waste generation, and the current state of industrial waste management — built to support solution development.</p>
+  <div class="hero-meta">
+    <div class="hero-stat">
+      <span class="hero-stat-num">$1.47T</span>
+      <span class="hero-stat-label">Waste Mgmt Market 2025</span>
+    </div>
+    <div class="hero-stat">
+      <span class="hero-stat-num">85.7%</span>
+      <span class="hero-stat-label">Industrial share of all waste</span>
+    </div>
+    <div class="hero-stat">
+      <span class="hero-stat-num">92M t</span>
+      <span class="hero-stat-label">Textile waste annually</span>
+    </div>
+    <div class="hero-stat">
+      <span class="hero-stat-num">8×</span>
+      <span class="hero-stat-label">Sectors covered</span>
+    </div>
+  </div>
+  <div class="hero-scroll">Scroll to explore</div>
+</section>
+
+<!-- TOC -->
+<nav class="toc">
+  <a href="#overview">Overview</a>
+  <a href="#manufacturing">Manufacturing</a>
+  <a href="#textile">Textile</a>
+  <a href="#chemical">Chemical</a>
+  <a href="#food">Food & Agri</a>
+  <a href="#construction">Construction</a>
+  <a href="#mining">Mining</a>
+  <a href="#pharma">Pharma</a>
+  <a href="#tech">Electronics</a>
+  <a href="#problems">Core Problems</a>
+  <a href="#opportunities">Opportunities</a>
+</nav>
+
+<!-- OVERVIEW -->
+<section class="section" id="overview">
+  <div class="section-label">01 · Global Context</div>
+  <div class="section-title">THE SCALE OF THE PROBLEM</div>
+  <p class="section-intro">Industrial waste is not a single problem — it is eight overlapping crises, each with distinct raw material dependencies, production chemistries, and failure modes in waste handling. Understanding each sector individually is the prerequisite for building any real solution.</p>
+
+  <div class="stats-row">
+    <div class="stat-block">
+      <span class="stat-num">$1.47<span class="stat-unit">T</span></span>
+      <div class="stat-desc">Global waste management market value in 2025 — projected to hit $2.75T by 2036</div>
+    </div>
+    <div class="stat-block">
+      <span class="stat-num">5.9<span class="stat-unit">%</span></span>
+      <div class="stat-desc">CAGR of industrial waste management through 2033, driven by stricter regulations</div>
+    </div>
+    <div class="stat-block">
+      <span class="stat-num">2.1B<span class="stat-unit">t</span></span>
+      <div class="stat-desc">Municipal solid waste generated in 2023 — on track to reach 3.8B tonnes by 2050</div>
+    </div>
+    <div class="stat-block">
+      <span class="stat-num">52<span class="stat-unit">%</span></span>
+      <div class="stat-desc">Of industrial waste still disposed in landfills — the single dominant method in 2025</div>
+    </div>
+  </div>
+
+  <div class="flow-container">
+    <div class="flow-box">
+      <div class="flow-box-title">Raw Material Acquisition</div>
+      <ul class="flow-box-items">
+        <li>Mining & extraction</li>
+        <li>Agricultural harvest</li>
+        <li>Synthetic production</li>
+        <li>Global procurement</li>
+        <li>Offtake agreements</li>
+      </ul>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">
+      <div class="flow-box-title">Production Process</div>
+      <ul class="flow-box-items">
+        <li>Mechanical processing</li>
+        <li>Chemical transformation</li>
+        <li>Thermal treatment</li>
+        <li>Assembly & fabrication</li>
+        <li>Quality rejection</li>
+      </ul>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">
+      <div class="flow-box-title">Waste Output</div>
+      <ul class="flow-box-items">
+        <li>Solid / liquid / gas</li>
+        <li>Hazardous byproducts</li>
+        <li>Effluent discharge</li>
+        <li>Emissions to air</li>
+        <li>Landfill or incineration</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- INDUSTRY SECTORS -->
+<section class="section" id="manufacturing">
+  <div class="section-label">02 · Sector Deep Dives</div>
+  <div class="section-title">INDUSTRY BY INDUSTRY</div>
+  <p class="section-intro">Each sector has a fundamentally different raw material profile and waste chemistry. Here is what each one actually does — and where it fails.</p>
+
+  <div class="industry-grid">
+
+    <!-- MANUFACTURING -->
+    <div class="industry-card c1">
+      <span class="card-icon">🏭</span>
+      <div class="card-title">Heavy Manufacturing</div>
+      <p class="card-desc">Automotive, metal fabrication, aerospace, machinery. The largest single contributor — accounting for 32.3% of industrial waste management demand in 2025.</p>
+      <div class="card-section">
+        <div class="card-section-label">Raw Material Acquisition</div>
+        <p class="card-section-text">Sources steel, aluminium, copper, plastics, and composites from global commodity markets. Major manufacturers use long-term contracts with tier-1 suppliers and maintain strategic stockpiles. AI-driven demand forecasting and IoT-linked supplier monitoring are now standard in large facilities. Critical minerals (lithium, cobalt, rare earths) are increasingly secured via direct equity stakes in mining projects, particularly by EV-adjacent manufacturers.</p>
+      </div>
+      <div class="card-section">
+        <div class="card-section-label">Waste Profile</div>
+        <p class="card-section-text">Metal chips and offcuts, lubricating oils, paint solvents, wastewater with heavy metal traces, packaging waste, defective parts. A mix of hazardous and non-hazardous streams requiring separate handling streams.</p>
+      </div>
+      <div class="tag-list">
+        <span class="tag danger">Metal swarf</span>
+        <span class="tag danger">Cutting fluids</span>
+        <span class="tag">Paint waste</span>
+        <span class="tag">Scrap metal (recyclable)</span>
+      </div>
+    </div>
+
+    <!-- TEXTILE -->
+    <div class="industry-card c2" id="textile">
+      <span class="card-icon">🧵</span>
+      <div class="card-title">Textile & Fashion</div>
+      <p class="card-desc">One of the most polluting sectors on earth. Responsible for up to 8% of global greenhouse gas emissions and consuming 215 trillion litres of water annually.</p>
+      <div class="card-section">
+        <div class="card-section-label">Raw Material Acquisition</div>
+        <p class="card-section-text">Natural fibres (cotton, wool, silk) sourced primarily from South/Southeast Asia; synthetics (polyester, nylon) derived from petroleum. Wet processing — dyeing, bleaching, finishing — uses 0.58 kg of chemical inputs for every 1 kg of fabric produced. Supply chains are notoriously opaque, spanning multiple countries with limited traceability.</p>
+      </div>
+      <div class="card-section">
+        <div class="card-section-label">Waste Profile</div>
+        <p class="card-section-text">92 million tonnes of textile waste generated annually. Only 8% of textile fibres in 2023 came from recycled sources. Wastewater from dyeing contains heavy metals and azo dyes. Around 20% of global industrial wastewater volume originates in this sector. Discarded clothing is often shipped to low-income nations where open dumping and burning are the primary disposal methods.</p>
+      </div>
+      <div class="tag-list">
+        <span class="tag danger">Dye effluent</span>
+        <span class="tag danger">Microplastics</span>
+        <span class="tag danger">Chemical sludge</span>
+        <span class="tag">Fabric offcuts</span>
+      </div>
+    </div>
+
+    <!-- CHEMICAL -->
+    <div class="industry-card c3" id="chemical">
+      <span class="card-icon">⚗️</span>
+      <div class="card-title">Chemical & Petrochemical</div>
+      <p class="card-desc">Produces plastics, solvents, fertilisers, dyes, and industrial inputs. Fastest-growing waste segment at 6.4% CAGR — because its waste streams are the most complex and require the most specialised treatment.</p>
+      <div class="card-section">
+        <div class="card-section-label">Raw Material Acquisition</div>
+        <p class="card-section-text">Feedstocks are crude oil, natural gas, minerals, and agricultural derivatives. Petrochemical companies secure supply through long-term futures contracts, refinery integration, and increasingly, bio-based feedstock partnerships. Geopolitical concentration risks are severe — many critical chemical inputs are refined in only 2–3 countries globally.</p>
+      </div>
+      <div class="card-section">
+        <div class="card-section-label">Waste Profile</div>
+        <p class="card-section-text">Spent catalysts, solvent residues, reaction byproducts, contaminated process water, and off-spec product batches. Produces the majority of hazardous industrial waste globally. Regulatory frameworks (REACH in Europe, EPA rules in the US) mandate strict tracking but enforcement gaps in developing regions are large.</p>
+      </div>
+      <div class="tag-list">
+        <span class="tag danger">Spent catalysts</span>
+        <span class="tag danger">Toxic effluent</span>
+        <span class="tag danger">PFAS compounds</span>
+        <span class="tag">Recoverable solvents</span>
+      </div>
+    </div>
+
+    <!-- FOOD & AGRICULTURE -->
+    <div class="industry-card c4" id="food">
+      <span class="card-icon">🌾</span>
+      <div class="card-title">Food Processing & Agriculture</div>
+      <p class="card-desc">A paradoxical sector — organic waste that is technically biodegradable but creates enormous methane loads and water pollution when handled poorly at scale.</p>
+      <div class="card-section">
+        <div class="card-section-label">Raw Material Acquisition</div>
+        <p class="card-section-text">Grains, fruits, vegetables, livestock, and water are sourced through spot markets, long-term farm contracts, and increasingly, vertical integration (owning farms). Seasonal availability and weather dependency create chronic supply volatility. Agrochemical inputs — fertilisers and pesticides — are procured from the chemical sector, creating a secondary dependency chain.</p>
+      </div>
+      <div class="card-section">
+        <div class="card-section-label">Waste Profile</div>
+        <p class="card-section-text">Peels, husks, offcuts, blood, fat, whey, process water, and packaging. Food waste globally represents ~1/3 of all food produced. Processing effluent has high biological oxygen demand (BOD), severely stressing water treatment systems. Animal processing generates blood and bone meal streams that require biosecure handling. Fertiliser runoff causes eutrophication in waterways.</p>
+      </div>
+      <div class="tag-list">
+        <span class="tag">Organic biomass</span>
+        <span class="tag danger">High-BOD effluent</span>
+        <span class="tag">Animal byproducts</span>
+        <span class="tag ok">Biogas potential</span>
+      </div>
+    </div>
+
+    <!-- CONSTRUCTION -->
+    <div class="industry-card c5" id="construction">
+      <span class="card-icon">🏗️</span>
+      <div class="card-title">Construction & Demolition</div>
+      <p class="card-desc">The fastest-growing application in industrial waste management, driven by global urbanisation. Generates enormous volumes of bulky waste that overwhelm landfill capacity in dense urban regions.</p>
+      <div class="card-section">
+        <div class="card-section-label">Raw Material Acquisition</div>
+        <p class="card-section-text">Cement, sand, gravel, steel rebar, timber, glass, and copper wiring. Sand is now a critically scarce global resource — the second most consumed natural resource after water. Procurement is heavily localised due to transport cost constraints, making regional supply shocks particularly impactful. Projects use commodity brokers and spot-buy models; large contractors use framework agreements with material suppliers.</p>
+      </div>
+      <div class="card-section">
+        <div class="card-section-label">Waste Profile</div>
+        <p class="card-section-text">Concrete rubble, bricks, tiles, wood offcuts, gypsum board, metal scraps, plastics, and hazardous materials such as asbestos in demolition work. Packaging waste is massive. C&D waste constitutes the single largest waste stream by volume in most countries. The EU's C&D recycling targets (70%+) are among the most ambitious industrial recycling mandates globally.</p>
+      </div>
+      <div class="tag-list">
+        <span class="tag">Concrete rubble</span>
+        <span class="tag danger">Asbestos</span>
+        <span class="tag ok">Steel scrap</span>
+        <span class="tag">Mixed debris</span>
+      </div>
+    </div>
+
+    <!-- MINING -->
+    <div class="industry-card c6" id="mining">
+      <span class="card-icon">⛏️</span>
+      <div class="card-title">Mining & Metallurgy</div>
+      <p class="card-desc">The origin point of most industrial raw materials. Also one of the most environmentally destructive sectors — generating waste in volumes that dwarf the product itself. For every tonne of copper produced, roughly 100 tonnes of waste rock are displaced.</p>
+      <div class="card-section">
+        <div class="card-section-label">Raw Material Acquisition</div>
+        <p class="card-section-text">Self-extracting sector — acquires ore bodies through concession licences, geological surveys, and increasingly, deep-sea and space mineral rights. Critical mineral access has become a geopolitical flashpoint in 2025: China controls over 70% of rare earth refining capacity and has used export restrictions as leverage. The US, EU, and India are all building strategic stockpiles and funding domestic extraction as countermeasures.</p>
+      </div>
+      <div class="card-section">
+        <div class="card-section-label">Waste Profile</div>
+        <p class="card-section-text">Tailings (crushed ore residue), waste rock piles, acid mine drainage (AMD), process water with heavy metals, and heap leach pad residues. Tailings dam failures are catastrophic — Brumadinho (2019) killed 270 people. Sulfide ore exposure generates sulfuric acid that contaminates rivers and groundwater for decades. Smelting produces slag, dross, and SO₂ emissions.</p>
+      </div>
+      <div class="tag-list">
+        <span class="tag danger">Acid mine drainage</span>
+        <span class="tag danger">Tailings slurry</span>
+        <span class="tag danger">Heavy metals</span>
+        <span class="tag">Slag (partially usable)</span>
+      </div>
+    </div>
+
+    <!-- PHARMACEUTICALS -->
+    <div class="industry-card c7" id="pharma">
+      <span class="card-icon">💊</span>
+      <div class="card-title">Pharmaceutical & Biotech</div>
+      <p class="card-desc">A low-volume, high-complexity waste sector. The actual quantities are small — but the hazard profile is disproportionately severe, including Active Pharmaceutical Ingredients (APIs) that evade conventional water treatment.</p>
+      <div class="card-section">
+        <div class="card-section-label">Raw Material Acquisition</div>
+        <p class="card-section-text">Active pharmaceutical ingredients (APIs), excipients, organic solvents, glass, and packaging materials. API synthesis depends on complex chemical precursors, many sourced from a highly concentrated supply base (India and China account for ~80% of global API production). Post-COVID supply chain diversification is ongoing but slow. Biotech firms additionally require cell culture media, biological reagents, and ultra-pure water.</p>
+      </div>
+      <div class="card-section">
+        <div class="card-section-label">Waste Profile</div>
+        <p class="card-section-text">Solvent waste (often the largest volume stream), API-contaminated process water, biological waste from fermentation, expired product, and sharps/packaging. Pharmaceutical effluent entering water bodies creates measurable ecological disruption — trace hormones and antibiotics affect aquatic reproduction and accelerate antimicrobial resistance. Incineration at high temperature is the regulated disposal standard but is energy-intensive.</p>
+      </div>
+      <div class="tag-list">
+        <span class="tag danger">API contamination</span>
+        <span class="tag danger">Biohazard waste</span>
+        <span class="tag danger">Solvent residues</span>
+        <span class="tag">Packaging waste</span>
+      </div>
+    </div>
+
+    <!-- ELECTRONICS -->
+    <div class="industry-card c8" id="tech">
+      <span class="card-icon">💻</span>
+      <div class="card-title">Electronics & Semiconductor</div>
+      <p class="card-desc">The fastest-growing waste type segment at 8% CAGR. Driven by relentlessly shortening product lifecycles and the paradox that the most technologically sophisticated products generate the most toxic waste.</p>
+      <div class="card-section">
+        <div class="card-section-label">Raw Material Acquisition</div>
+        <p class="card-section-text">Silicon, rare earth elements, gold, silver, copper, tantalum, cobalt, and lithium. Semiconductor fabrication requires ultra-pure materials — any contamination at part-per-billion levels destroys yields. Procurement is highly concentrated: TSMC alone accounts for ~90% of advanced chip production. Geopolitical risk from Taiwan Strait tensions has accelerated the US CHIPS Act ($52B) and EU Chips Act (€43B) to de-risk supply.</p>
+      </div>
+      <div class="card-section">
+        <div class="card-section-label">Waste Profile</div>
+        <p class="card-section-text">E-waste contains lead, mercury, cadmium, arsenic, and hexavalent chromium — all severely toxic. Semiconductor fabs generate perfluorocarbon gases, ultra-pure water effluent, and solvent residues. Globally, only ~20% of e-waste is formally recycled; the rest is informally processed in unregulated sites in Ghana, India, and China, exposing workers to heavy metal contamination. Short product lifecycles mean volume is growing faster than recycling infrastructure can scale.</p>
+      </div>
+      <div class="tag-list">
+        <span class="tag danger">Heavy metals</span>
+        <span class="tag danger">PFC gases</span>
+        <span class="tag ok">Precious metal recovery</span>
+        <span class="tag">PCB boards</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- CORE PROBLEMS -->
+<section class="section" id="problems">
+  <div class="section-label">03 · Pain Points</div>
+  <div class="section-title">CORE WASTE PROBLEMS</div>
+  <p class="section-intro">These are the structurally unsolved problems across all sectors — where existing solutions are either inadequate, unavailable, or economically inaccessible, particularly for mid-sized and developing-market operators.</p>
+
+  <table class="problem-table">
+    <thead>
+      <tr>
+        <th>Problem</th>
+        <th>Affected Sectors</th>
+        <th>Current "Solution"</th>
+        <th>Why It Fails</th>
+        <th>Severity</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong style="color:var(--light)">Hazardous waste misclassification</strong><br><span style="color:var(--muted);font-size:12px">Industries fail to correctly identify hazardous streams, mixing them with general waste</span></td>
+        <td>Chemical, Pharma, Mining, Electronics</td>
+        <td>Manual categorisation, periodic audits</td>
+        <td>Labour-intensive, error-prone, infrequent — non-compliance discovered only after damage</td>
+        <td><span class="severity sev-critical">Critical</span></td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--light)">Wastewater treatment gap</strong><br><span style="color:var(--muted);font-size:12px">20% of global industrial wastewater from textiles alone goes untreated or inadequately treated</span></td>
+        <td>Textile, Food, Chemical, Pharma</td>
+        <td>Effluent treatment plants (ETPs)</td>
+        <td>Capital cost prohibitive for SMEs; outdated technology misses emerging contaminants like APIs and PFAS</td>
+        <td><span class="severity sev-critical">Critical</span></td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--light)">No closed-loop for textile fibre</strong><br><span style="color:var(--muted);font-size:12px">Only 8% of textile fibres are recycled; the rest are incinerated or landfilled</span></td>
+        <td>Textile & Fashion</td>
+        <td>Manual sorting + mechanical shredding</td>
+        <td>Blended fabrics (cotton/polyester) are extremely difficult to separate; recycled fibre quality is degraded</td>
+        <td><span class="severity sev-high">High</span></td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--light)">E-waste informal processing</strong><br><span style="color:var(--muted);font-size:12px">~80% of e-waste ends up in unregulated processing — acid baths, open burning, hand-picking</span></td>
+        <td>Electronics, Manufacturing</td>
+        <td>Extended Producer Responsibility (EPR) laws</td>
+        <td>EPR compliance is self-reported and enforcement is weak, especially cross-border</td>
+        <td><span class="severity sev-critical">Critical</span></td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--light)">Food waste volume at processing stage</strong><br><span style="color:var(--muted);font-size:12px">Processing loss of 10–40% depending on crop type; perishable waste generates methane in landfills</span></td>
+        <td>Food Processing & Agriculture</td>
+        <td>Composting, animal feed diversion</td>
+        <td>Logistics for collection and diversion are fragmented; biogas capture requires expensive infrastructure</td>
+        <td><span class="severity sev-high">High</span></td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--light)">Mining tailings instability</strong><br><span style="color:var(--muted);font-size:12px">Over 3,500 tailings storage facilities globally; an estimated 30% are at risk of failure</span></td>
+        <td>Mining & Metallurgy</td>
+        <td>Engineered tailings dams</td>
+        <td>Dam construction and monitoring are underfunded in smaller operations; dam breaches are catastrophic</td>
+        <td><span class="severity sev-critical">Critical</span></td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--light)">Waste data opacity</strong><br><span style="color:var(--muted);font-size:12px">Most industries lack real-time visibility into what waste streams they generate and in what volumes</span></td>
+        <td>All sectors</td>
+        <td>Annual self-reported disclosures</td>
+        <td>Incentive to underreport; data is stale; no granular traceability from generation point to disposal</td>
+        <td><span class="severity sev-high">High</span></td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--light)">Construction debris segregation failure</strong><br><span style="color:var(--muted);font-size:12px">Mixed C&D debris prevents recycling — contaminated concrete cannot be reused as aggregate</span></td>
+        <td>Construction</td>
+        <td>On-site sorting guidelines</td>
+        <td>Time pressure, labour cost, and lack of enforcement mean mixing is the default on-site behaviour</td>
+        <td><span class="severity sev-medium">Medium</span></td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- OPPORTUNITIES -->
+<section class="section" id="opportunities">
+  <div class="section-label">04 · Solution Landscape</div>
+  <div class="section-title">WHERE SOLUTIONS CAN WIN</div>
+  <p class="section-intro">The waste problem is not one big problem — it is a constellation of market failures, each addressable by a targeted solution. Here are the highest-leverage opportunity spaces as of 2025.</p>
+
+  <div class="opp-grid">
+    <div class="opp-card">
+      <div class="opp-num">01</div>
+      <div class="opp-title">Waste Stream Intelligence Platforms</div>
+      <p class="opp-text">IoT sensors + AI classification to give factories real-time visibility into waste type, volume, and hazard level. Removes the data opacity problem across all sectors. Most industries currently rely on manual logs and periodic audits.</p>
+      <div class="opp-badge">→ Target: All industrial sectors</div>
+    </div>
+    <div class="opp-card">
+      <div class="opp-num">02</div>
+      <div class="opp-title">Chemical Textile Recycling Infrastructure</div>
+      <p class="opp-text">Solvolysis and depolymerisation technologies that separate cotton/polyester blends back to monomer level, producing virgin-quality fibre. BCG estimates the global textile waste opportunity at 120 million metric tonnes per year.</p>
+      <div class="opp-badge">→ Target: Textile, Apparel</div>
+    </div>
+    <div class="opp-card">
+      <div class="opp-num">03</div>
+      <div class="opp-title">Modular Wastewater Treatment</div>
+      <p class="opp-text">Containerised, plug-and-play effluent treatment systems affordable for SME textile or food processors. The SME gap is large — ETP infrastructure investment is accessible only to large facilities.</p>
+      <div class="opp-badge">→ Target: Textile, Food, Pharma</div>
+    </div>
+    <div class="opp-card">
+      <div class="opp-num">04</div>
+      <div class="opp-title">Industrial Waste Marketplaces</div>
+      <p class="opp-text">Platforms that match waste generators to buyers who can use the material — metal swarf to foundries, food offcuts to animal feed producers, construction rubble to road base suppliers. Converts cost centres to revenue streams.</p>
+      <div class="opp-badge">→ Target: Manufacturing, Construction, Food</div>
+    </div>
+    <div class="opp-card">
+      <div class="opp-num">05</div>
+      <div class="opp-title">Formal E-Waste Collection Networks</div>
+      <p class="opp-text">Reverse logistics infrastructure and urban collection networks that intercept e-waste before it enters informal channels. Urban mining of PCBs yields 200–300g of gold per tonne — more than most gold ore. The economics are compelling if collection is solved.</p>
+      <div class="opp-badge">→ Target: Electronics, Consumer</div>
+    </div>
+    <div class="opp-card">
+      <div class="opp-num">06</div>
+      <div class="opp-title">Waste-to-Energy for Organic Streams</div>
+      <p class="opp-text">Anaerobic digestion and pyrolysis systems that convert food processing biomass, agricultural residue, and textile offcuts into biogas or syngas. Veolia and Waste Management launched a major organic-to-RNG partnership in 2024, validating the model at scale.</p>
+      <div class="opp-badge">→ Target: Food, Agriculture, Textile</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONCLUSION -->
+<section class="conclusion">
+  <div class="section-label" style="margin-bottom: 28px;">05 · Synthesis</div>
+  <p class="conclusion-text">"The waste problem is fundamentally an information problem, a logistics problem, and an economic incentive problem — not a technology problem. The technologies to manage almost all industrial waste exist. What is missing is the infrastructure to connect generators, processors, and buyers at the right cost and scale."</p>
+  <div class="conclusion-body">
+    <p>Every sector reviewed — from textile dyeing to semiconductor fabrication — shares a common pattern: waste is generated at high velocity, classified poorly (or not at all), and disposed of through the path of least resistance, which almost always means landfill, incineration, or illegal dumping. The regulatory push is intensifying globally: the EU's Packaging Regulation (2025/40), California's SB 54, India's Extended Producer Responsibility rules, and the CRMA are all tightening the compliance floor.</p>
+    <br>
+    <p>The industrial waste management market growing from $1.47 trillion to an expected $2.75 trillion by 2036 is not just a business opportunity — it is a signal that the cost of doing nothing is becoming unsustainable for industries themselves. Solutions that reduce both the regulatory liability and the operational cost of waste handling simultaneously have the clearest path to adoption, especially in the SME and developing-market segments where the gap between current practice and required standard is widest.</p>
+    <br>
+    <p>The sectors to prioritise for solution development, based on waste volume, hazard severity, and current solution inadequacy, are: <strong style="color:var(--accent)">Textile &amp; Fashion</strong> (volume + zero circular infrastructure), <strong style="color:var(--accent)">Electronics</strong> (growth rate + toxicity + informal system failure), and <strong style="color:var(--accent)">Chemical &amp; Pharma</strong> (hazard complexity + regulatory pressure). Food processing is a close fourth with high biogas conversion potential.</p>
+  </div>
+</section>
+
+<footer>
+  <span>Industrial Waste Research Report · 2025</span>
+  <span>Data: UNEP · Grand View Research · Mordor Intelligence · BCG · WEF</span>
+</footer>
+
+</body>
+</html>

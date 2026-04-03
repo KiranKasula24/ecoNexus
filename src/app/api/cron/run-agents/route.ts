@@ -1,10 +1,23 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { AgentRunner } from "@/lib/agents/agent-runner";
 
 export const dynamic = "force-dynamic";
-export const maxDuration = 60; // 60 seconds timeout
+export const maxDuration = 10; // Hobby/free-tier friendly timeout
+
+const isCronEnabled = process.env.ENABLE_AGENT_CRON === "true";
 
 export async function GET() {
+  if (!isCronEnabled) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Agent cron is disabled",
+        timestamp: new Date().toISOString(),
+      },
+      { status: 503 },
+    );
+  }
+
   console.log(" CRON: Starting agent cycle...");
 
   try {
@@ -35,4 +48,3 @@ export async function GET() {
 export async function POST() {
   return GET();
 }
-

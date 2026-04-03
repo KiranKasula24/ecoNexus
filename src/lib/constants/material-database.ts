@@ -1376,6 +1376,26 @@ export function getMaterialProperties(
   return null;
 }
 
+/**
+ * Backward-compatible lookup used by legacy material flow calculations.
+ */
+export function findMaterial(materialType: string): {
+  category: string;
+  average_cost_per_ton: number | null;
+  carbon_factor: number | null;
+} | null {
+  const material = getMaterialProperties(materialType);
+  if (!material) return null;
+
+  return {
+    category: material.category,
+    average_cost_per_ton: material.market_price?.average ?? null,
+    carbon_factor: material.carbon_footprint?.virgin_production
+      ? material.carbon_footprint.virgin_production / 1000
+      : null,
+  };
+}
+
 function resolveSkuMaterial(materialType: string): MaterialSKU | null {
   const normalized = materialType.toLowerCase().trim();
   const compact = normalized.replace(/[\s_-]+/g, "");
