@@ -5,6 +5,10 @@ import { createPassportFromWasteStream } from "@/lib/material-intelligence/passp
 import { generateMaterialFlowOpportunities } from "@/lib/material-intelligence/opportunity-engine";
 import { AgentRunner } from "@/lib/agents/agent-runner";
 import { ensureSuperAgentForLocality } from "@/lib/agents/super-agent-registry";
+import {
+  getEffectiveMappingsForWasteSku,
+  getSubstitutionCandidatesForInputSku,
+} from "@/lib/mapping/processed-sku-mapper";
 
 type WasteClassification =
   | "reusable"
@@ -17,6 +21,7 @@ type PrimaryMaterialInput = {
   name: string;
   category: string;
   subtype: string;
+  sku?: string;
   monthlyVolume: number;
   unit: string;
   costPerUnit: number;
@@ -29,6 +34,7 @@ type WasteGeneratedInput = {
   materialName: string;
   materialCategory: string;
   materialSubtype: string;
+  sku?: string;
   physicalForm: string;
   monthlyVolume: number;
   unit: string;
@@ -159,6 +165,7 @@ export async function POST(request: NextRequest) {
         unit: material.unit || "tons",
         cost_per_unit: toPositiveNumber(material.costPerUnit),
         technical_properties: {
+          sku: material.sku || null,
           supplier: material.supplier || null,
           recycled_content_percent: toPositiveNumber(material.recycledContentPercent),
           process_step: material.processStep || null,
@@ -191,6 +198,7 @@ export async function POST(request: NextRequest) {
       cost_per_unit: toPositiveNumber(wasteGenerated.currentDisposalCost),
       carbon_footprint: toPositiveNumber(wasteGenerated.carbonFootprint),
       technical_properties: {
+        sku: wasteGenerated.sku || null,
         moisture_content_percent: toPositiveNumber(wasteGenerated.moistureContent),
         water_usage_per_unit: toPositiveNumber(wasteGenerated.waterUsage),
         energy_consumption_per_unit: toPositiveNumber(wasteGenerated.energyConsumption),
@@ -250,9 +258,55 @@ export async function POST(request: NextRequest) {
       wasteGenerated: body.wasteGenerated,
     });
 
+    const outputSkuCandidate =
+      (wasteGenerated.sku || wasteGenerated.materialSubtype || wasteGenerated.materialCategory || "")
+        .trim()
+        .toUpperCase();
+    const outputProcessedMappings = outputSkuCandidate
+      ? await getEffectiveMappingsForWasteSku(outputSkuCandidate)
+      : [];
+
+    const inputSubstitutionMappings = await Promise.all(
+      body.primaryMaterials.map(async (input) => {
+        const inputSku = (input.sku || input.subtype || input.category || "").trim().toUpperCase();
+        if (!inputSku) return { input_sku: "", candidates: [] as any[] };
+        const candidates = await getSubstitutionCandidatesForInputSku(inputSku);
+        return {
+          input_sku: inputSku,
+          candidates: candidates.slice(0, 5).map((c) => ({
+            waste_sku: c.waste_sku,
+            processed_sku: c.processed_sku,
+            source: c.source,
+            score_breakdown: {
+              quality_score: c.quality_score,
+              cost_competitiveness_score: c.cost_competitiveness_score,
+              recovery_score: c.recovery_score,
+              market_demand_score: c.market_demand_score,
+            },
+          })),
+        };
+      }),
+    );
+
     const mergedTechnicalProperties = {
       ...((passport.technical_properties as Record<string, unknown> | null) || {}),
       circular_opportunities: circularOpportunities,
+      processed_mapping: {
+        mapping_source: outputProcessedMappings[0]?.source || null,
+        output_waste_sku: outputSkuCandidate || null,
+        processed_sku_candidates: outputProcessedMappings.slice(0, 8).map((m) => ({
+          processed_sku: m.processed_sku,
+          source: m.source,
+          confidence: m.confidence,
+          score_breakdown: {
+            quality_score: m.quality_score,
+            cost_competitiveness_score: m.cost_competitiveness_score,
+            recovery_score: m.recovery_score,
+            market_demand_score: m.market_demand_score,
+          },
+        })),
+      },
+      input_substitution_candidates: inputSubstitutionMappings.filter((x) => x.input_sku),
     };
 
     const { data: updatedPassport, error: passportUpdateError } = await supabase

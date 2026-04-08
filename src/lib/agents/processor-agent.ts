@@ -5,6 +5,12 @@
 
 import { supabase } from "@/lib/database/supabase";
 import { getMaterialProperties } from "@/lib/constants/material-database";
+import {
+  computeConversionEconomics,
+  getEffectiveMappingsForWasteSku,
+  getWasteCandidatesForProcessedSku,
+  selectProcessorCandidate,
+} from "@/lib/mapping/processed-sku-mapper";
 
 export class ProcessorAgent {
   private agentId: string;
@@ -135,9 +141,7 @@ export class ProcessorAgent {
 
       // Find what input we need to produce this output
       // Simple mapping: assume 1:1 for MVP (e.g., plastic-scrap  recycled-plastic)
-      const inputNeeded = this.profile.input_materials.find((input: string) =>
-        input.includes(outputNeeded.split("-")[0]),
-      );
+      const inputNeeded = await this.mapOutputToInput(outputNeeded);
 
       if (!inputNeeded) continue;
 
@@ -201,7 +205,7 @@ export class ProcessorAgent {
       const volumeNeeded = buyerContent.volume_needed;
 
       // Determine what input we need to create this output
-      const inputMaterial = this.mapOutputToInput(outputNeeded);
+      const inputMaterial = await this.mapOutputToInput(outputNeeded);
 
       if (!inputMaterial) {
         console.log(`No input mapping for output: ${outputNeeded}`);
@@ -227,10 +231,65 @@ export class ProcessorAgent {
         continue;
       }
 
-      // Take best supplier (lowest price)
-      const bestSupplier = filteredInputOffers.sort(
-        (a, b) => (a.content as any).price - (b.content as any).price,
-      )[0];
+      // Capabilities-first mapping + economics gate
+      let bestSupplier: any | null = null;
+      let bestEconomics: any | null = null;
+      for (const offer of filteredInputOffers) {
+        const offerContent = (offer.content || {}) as any;
+        const offerWasteSku = String(
+          offerContent.sku ||
+            offerContent.waste_sku ||
+            offerContent.material_subtype ||
+            offerContent.material_category ||
+            inputMaterial,
+        )
+          .trim()
+          .toUpperCase();
+
+        const mappings = await getEffectiveMappingsForWasteSku(offerWasteSku);
+        const selectedMapping =
+          mappings.find(
+            (m) =>
+              m.processed_sku.toLowerCase() === String(outputNeeded || "").toLowerCase(),
+          ) || mappings[0] || null;
+
+        const defaultFee =
+          this.profile.processing_fee_per_ton?.[
+            this.profile.processing_services?.[0] || "sorting"
+          ] || 75;
+
+        const economics = await computeConversionEconomics({
+          wasteSku: offerWasteSku,
+          processedSku: selectedMapping?.processed_sku || outputNeeded,
+          sellerPricePerTon: Number(offerContent.price || 0),
+          volume: Number(Math.min(volumeNeeded, offerContent.volume || 0)),
+          buyerMaxPricePerTon: Number(buyerContent.max_price || 0),
+          defaultProcessingFeePerTon: Number(defaultFee),
+          qualityScore: selectedMapping?.quality_score ?? null,
+          recoveryScore: selectedMapping?.recovery_score ?? null,
+          costCompetitivenessScore: selectedMapping?.cost_competitiveness_score ?? null,
+        });
+
+        if (!economics.viable_for_buyer) continue;
+
+        if (
+          !bestEconomics ||
+          economics.net_cost_per_ton < bestEconomics.net_cost_per_ton ||
+          (economics.net_cost_per_ton === bestEconomics.net_cost_per_ton &&
+            Number(economics.quality_score || 0) > Number(bestEconomics.quality_score || 0)) ||
+          (economics.net_cost_per_ton === bestEconomics.net_cost_per_ton &&
+            Number(economics.quality_score || 0) === Number(bestEconomics.quality_score || 0) &&
+            Number(economics.recovery_score || 0) > Number(bestEconomics.recovery_score || 0))
+        ) {
+          bestSupplier = offer;
+          bestEconomics = economics;
+        }
+      }
+
+      if (!bestSupplier || !bestEconomics) {
+        console.log("No economically viable supplier after conversion mapping");
+        continue;
+      }
 
       const supplierContent = bestSupplier.content as any;
       const inputPrice = supplierContent.price;
@@ -253,12 +312,8 @@ export class ProcessorAgent {
       }
 
       // Calculate economics
-      const processingFee =
-        this.profile.processing_fee_per_ton?.[
-          this.profile.processing_services?.[0] || "sorting"
-        ] || 75;
-
-      const outputPrice = inputPrice + processingFee + processingFee * 0.15; // 15% margin
+      const processingFee = bestEconomics.processing_fee_per_ton;
+      const outputPrice = bestEconomics.net_cost_per_ton;
 
       // Check if buyer's max price supports this
       if (outputPrice > buyerContent.max_price) {
@@ -269,6 +324,20 @@ export class ProcessorAgent {
       }
 
       // WE HAVE A MATCH! Structure three-way deal
+      const selectedProcessor =
+        (await selectProcessorCandidate({
+          inputSku: inputMaterial,
+          outputSku: outputNeeded,
+          volume: processableVolume,
+          locality: (buyRequest as any).locality,
+        })) ||
+        ({
+          processor_agent_id: this.agentId,
+          processor_company_id: this.companyId,
+          score: 0,
+          processing_fee_per_ton: processingFee,
+        } as const);
+
       const threeWayDeal = await this.structureThreeWayDeal({
         supplier: {
           post_id: bestSupplier.id,
@@ -279,8 +348,8 @@ export class ProcessorAgent {
           price: inputPrice,
         },
         processor: {
-          company_id: this.companyId,
-          agent_id: this.agentId,
+          company_id: selectedProcessor.processor_company_id,
+          agent_id: selectedProcessor.processor_agent_id,
           processing_fee: processingFee,
           input_material: inputMaterial,
           output_material: outputNeeded,
@@ -293,6 +362,16 @@ export class ProcessorAgent {
           volume: processableVolume,
           max_price: buyerContent.max_price,
           final_price: outputPrice,
+        },
+        rationale: {
+          mapping_source: "capabilities-first",
+          score_breakdown: {
+            quality_score: bestEconomics.quality_score,
+            recovery_score: bestEconomics.recovery_score,
+            cost_competitiveness_score: bestEconomics.cost_competitiveness_score,
+          },
+          economics: bestEconomics,
+          selected_processor_score: selectedProcessor.score,
         },
       });
 
@@ -309,9 +388,14 @@ export class ProcessorAgent {
   /**
    * Map output material to required input material
    */
-  private mapOutputToInput(outputMaterial: string): string | null {
+  private async mapOutputToInput(outputMaterial: string): Promise<string | null> {
     if (!outputMaterial) return null;
     const key = outputMaterial.toLowerCase();
+
+    const mappedWasteCandidates = await getWasteCandidatesForProcessedSku(outputMaterial);
+    if (mappedWasteCandidates.length > 0) {
+      return mappedWasteCandidates[0].waste_sku;
+    }
 
     // Simple mapping rules (expand as needed)
     const mappings: Record<string, string> = {
@@ -416,6 +500,7 @@ export class ProcessorAgent {
       max_price: number;
       final_price: number;
     };
+    rationale?: any;
   }): Promise<any | null> {
     try {
       // Create three-way deal record
@@ -465,6 +550,8 @@ export class ProcessorAgent {
             processing_fee: params.processor.processing_fee,
             buyer_pays: params.buyer.final_price,
           },
+          rationale: params.rationale || null,
+          selected_processor_agent_id: params.processor.agent_id,
           annual_value: threeWayDeal.total_value_annual,
         },
         locality: "regional",
